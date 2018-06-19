@@ -1,32 +1,32 @@
 ## compilando e executando o trabalho de maneira automatizada
-g++ -std=c++11 trabalho1.cpp -o trabalho1
+g++ -std=c++11 trabalho2.cpp -o trabalho2
 echo '
 *****
 Compilando bin.asm'
 sleep 5
-./trabalho1 -p bin bin
+./trabalho2 -p bin bin
 echo '
 *****
 Compilando triangulo.asm'
 sleep 5
-./trabalho1 -p triangulo triangulo
+./trabalho2 -p triangulo triangulo
 echo '
 *****
 Compilando test_basico.asm'
 sleep 5
-./trabalho1 -p test_basico test_basico
+./trabalho2 -p test_basico test_basico
 echo '
 *****
 Compilando test_erro_assembler.asm'
 sleep 5
-./trabalho1 -p test_erro_assembler test_erro_assembler
+./trabalho2 -p test_erro_assembler test_erro_assembler
 echo '
 *****
 Compilando test_erro_lexer.asm'
 sleep 5
-./trabalho1 -p test_erro_lexer test_erro_lexer
+./trabalho2 -p test_erro_lexer test_erro_lexer
 echo '
 *****
 Compilando test_vector_plus.asm'
 sleep 5
-./trabalho1 -p test_vector_plus test_vector_plus
+./trabalho2 -p test_vector_plus test_vector_plus

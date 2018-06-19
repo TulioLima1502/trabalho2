@@ -20,10 +20,10 @@
 // É NECESSAŔIO TER OS PACOTES DE C++ PARA REALIZAR A COMPILAÇÃO E EXECUÇÃO PELA LINHA DE COMANDO
 // É NECESSÁRIO REALIZAR A COMPILAÇÃO PARA SÓ EM SEGUIDA EXECUTAR
 // O COMANDO DE COMPILAÇÃO É: g++ -std=c++11 trabalho1.cpp -o <nome do executável>
-// DEPOIS DE COMPILADO BASTA EXECUTAR O PROGRAMA COM O COMANDO: 
+// DEPOIS DE COMPILADO BASTA EXECUTAR O PROGRAMA COM O COMANDO:
 //
 //				./<nome do executável> -x <nome do arquivo>.asm <nome do arquivo de saida>
-// 
+//
 // ** PARA CORRETO FUNCIONAMENTO É NECESSAŔIO TER UM ARQUIVO TEXTO COM EXTENSÃO .ASM NA MESMA PASTA DO PROGRAMA TRABALHO1.CPP
 
 #include <iostream>
@@ -609,7 +609,7 @@ int verifica_argumento_macro(string saida, string argumento)
 				//agora é necessário descobrir quantos argumentos essa função tem
 				cout << "Para descobrir a quantidade de argumentos é necessário usar a linha: " << mntbusca << endl;
 				num_de_args = mntbusca.substr(mntbusca.find("\t") + 1, mntbusca.size());
-				num_de_args = num_de_args.substr(0,1);
+				num_de_args = num_de_args.substr(0, 1);
 				cout << num_de_args << endl;
 				//assim eu tenho a quantidade de argumentos mínima que eu tenho que ter na chamada dessa linha
 				n = 0;
@@ -1054,7 +1054,8 @@ void expande_macro(char *file_name)
 					getline(meufile, line);
 					cout << linha_aux << " " << line << endl;
 					line = linha_auxdois + " " + line;
-				}else if (linha_aux == salto_dois)
+				}
+				else if (linha_aux == salto_dois)
 				{
 					cout << "Achou o problema 2" << endl;
 					getline(meufile, line);
@@ -1986,57 +1987,91 @@ int main(int argc, char *argv[])
 	//argv eh um vetor com os argumentos. argv[0] sempre sera o path do programa,
 	//entao eh basicamente ignorado. por isso, o argc na verdade vai ser o numero
 	//de argumentos mais um.
-	if (argc != 4)
-	{
-		cout << "\nERRO.\nNúmero de argumentos inválidos! " << endl;
-		return 0;
-	}
 
 	string file_name;
+	string file_in;
+	int lineachousection;
 
-	file_name = argv[2]; // passar para learquivo(). eh o nome do arquivo .asm.
-	string file_in = file_name + ".asm";
-	if (!file_exist(file_in))
-	{
-		cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+	if(argc == 1){
+		cout << "ERRO!!! Chamada errada de Programa, deve ter pelo menos 1 arquivo especificado na chamada do sistema..." << endl;
 		return 0;
 	}
 
-	//lerarquivo(argv[2],argv[3]);
-	int lineachousection = lerarquivo(file_in, argv[3]);
-
-	if (string(argv[1]) == "-p")
+	if ((string(argv[1]) == "-o")||(string(argv[1]) == "-p")||(string(argv[1]) == "-m"))
 	{
+		if (argc != 4)
+		{
+			cout << "\nERRO.\nNúmero de argumentos inválidos! " << endl;
+			return 0;
+		}
 
-		pre_procesamento(argv[3], lineachousection);
-	}
-	else if (string(argv[1]) == "-m")
-	{
-		pre_procesamento(argv[3], lineachousection);
-		expande_macro(argv[3]);
-		// realiza a expansão das macros em um arquivo com extensão .mcr
-		// pega o arquivo da etapa anterior, le o que está nele e executa a criação da MNT e da MDT
-		// depois utiliza o algoritmo de expansão das macros que está na função de passagem zero
-		// mostra esse arquivo com as macros expandidas
+		file_name = argv[2]; // passar para learquivo(). eh o nome do arquivo .asm.
+		file_in = file_name + ".asm";
+		if (!file_exist(file_in))
+		{
+			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+			return 0;
+		}
 
-		//montagem();
-		//codigo_objeto();
-	}
-	else if (string(argv[1]) == "-o")
-	{
-		pre_procesamento(argv[3], lineachousection);
-		expande_macro(argv[3]);
-		//FUNÇOES DA MONTAGEM
-		string file_ = argv[3];
-		file_in = file_ + ".mcr";
-		string file_out = file_ + ".o"; //todo trocar pra '.o'
-		montagem(file_in, file_out);
-		//Realiza a montagem do código depois de expandir as macros
-	}
+		//lerarquivo(argv[2],argv[3]);
+		lineachousection = lerarquivo(file_in, argv[3]);
 
-	else
-	{
-		cout << "\nERRO.\nComando de execução inválido." << endl;
+		if (string(argv[1]) == "-p")
+		{
+
+			pre_procesamento(argv[3], lineachousection);
+		}
+		else if (string(argv[1]) == "-m")
+		{
+			pre_procesamento(argv[3], lineachousection);
+			expande_macro(argv[3]);
+			// realiza a expansão das macros em um arquivo com extensão .mcr
+			// pega o arquivo da etapa anterior, le o que está nele e executa a criação da MNT e da MDT
+			// depois utiliza o algoritmo de expansão das macros que está na função de passagem zero
+			// mostra esse arquivo com as macros expandidas
+
+			//montagem();
+			//codigo_objeto();
+		}
+		else if (string(argv[1]) == "-o")
+		{
+			pre_procesamento(argv[3], lineachousection);
+			expande_macro(argv[3]);
+			//FUNÇOES DA MONTAGEM
+			string file_ = argv[3];
+			file_in = file_ + ".mcr";
+			string file_out = file_ + ".o"; //todo trocar pra '.o'
+			montagem(file_in, file_out);
+			//Realiza a montagem do código depois de expandir as macros
+		}
+
+		else
+		{
+			cout << "\nERRO.\nComando de execução inválido." << endl;
+		}
+	}else{
+		if ((argc > 3)||(argc < 2))
+		{
+			cout << "\nERRO.\nNúmero de argumentos inválidos! " << endl;
+			return 0;
+		}
+
+		if(argc == 2){
+			cout << "Faz a saída do ligador para 1 arquivo" << endl;
+			//Descobrir como fazer 1 arquivo do ligador
+		}
+		else if(argc == 3){
+			
+			cout << "Faz a saída do ligador para 2 arquivos" << endl;
+			//Descobrir como fazer para 2 arquivos depois de ter feito para 1 arquivo
+			file_name = argv[2]; // passar para learquivo(). eh o nome do arquivo .asm.
+			file_in = file_name + ".asm";
+
+			cout << argv[1] << endl;
+			cout << file_name << endl;
+			cout << file_in << endl;
+		}
+
 	}
 
 	return 0;

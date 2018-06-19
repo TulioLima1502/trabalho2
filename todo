@@ -1,3 +1,7 @@
-/TODO    Identificar quando o comando de montagem tiver o segundo arquivo
-    /TODO    se tiver apenas um arquivo faz como o programa deve ser feito hoje
-    /TODO    se tiver dois arquivos fas a primeira compilação e a segunda e depois liga os arquivos
+TODO    Definir o que é necessário para fazer a saída do arquivo ligado uma vez que temos o arquivo objeto feito
+    TODO    Fazer a contagem de linha do arquivo objeto no header
+    TODO    Nome do programa no header
+    TODO    Informações que são relativas no arquivo objeto
+
+TODO    Depois de feito para apenas 1 arquivo, fazer para dois arquivos
+    TODO    Pesquisar o que é externo e o que é publico e fazer modificações nas funções que temos hoje para salvar essas informações apenas quando a ligação for para dois programas(pode ser uma flag que ativa a criação dessas tabelas ou mesmo uma nova função)

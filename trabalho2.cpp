@@ -1699,6 +1699,145 @@ void primeira_passagem(string file_in)
 	}
 }
 
+void primeira_passagem1(string file_in)
+{
+	cout << "Começando a fazer a primeira passagem no arquivo: ";
+	cout << file_in << endl;
+
+	//*******PRIMEIRA PASSAGEM*******
+	std::ifstream infile(file_in);
+	std::string line;
+	string str;
+
+	int n_linha = 1; //número da linha do programa
+	int pc = 0;		 //número do endereço equivalente
+
+	int simbolo_redefinido = 0;
+	int found = 0;
+
+	vector<string>::iterator it;
+
+	//Cria arquivo intermediario
+	//ofstream ofile("file_inter.txt");
+	//While lê arquivo de entrada até o arquivo acabar
+	while (std::getline(infile, line))
+	{
+
+		//ANÁLISE LÉXICA
+		//separa os tokens e faz análise léxica
+		vector<string> token_vector = separate_tokens(line);
+		lexer(token_vector, n_linha);
+
+		it = token_vector.begin();
+		str = *it;
+		//VERIFICA SE É LABEL
+		found = 0;
+		if (str.back() == ':') //procura no fim do primeiro token ':'
+		{
+			str.erase(std::prev(str.end())); //apaga o ':'
+			if (token_vector.size())
+			{
+				//percorre toda a tabela de simbolos  comparando o token do arquivo com o simbolo definido na tabela
+				for (vector<tabela_simbolo>::iterator it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
+					if (!str.compare((*it_s).simbolo)) //ja está definido na tabela
+					{
+						printf("Erro Semântico! \n Símbolo redefinido. \n Linha: %d \n", n_linha);
+						simbolo_redefinido = 1;
+					}
+				if (!simbolo_redefinido)
+				{
+					//str.erase(std::prev(str.end()));
+					definir_label(str, pc); //inclui arquivo na tabela
+				}
+			}
+			if (token_vector.size() > 1) //evitar seg fault
+				++it;					 //pega o proximo token da linha do arquivo
+			str = *it;
+
+			if (!str.compare("CONST"))
+			{
+				it--;
+				for (vector<tabela_simbolo>::iterator it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
+				{
+
+					str = *it;
+					str.erase(std::prev(str.end()));
+					if (!str.compare((*it_s).simbolo))
+					{
+						(*it_s).is_const = 1;
+						it++;
+						it++;
+
+						if ((*it).find("0X") == 0)
+							(*it_s).valor_const = retorna_decimal(*it);
+						else
+							(*it_s).valor_const = stoi(*it);
+
+						it--;
+						it--;
+						break;
+					}
+				}
+				it++;
+				str = *it;
+			}
+		}
+		//VERIFICA SE É INSTRUÇÃO
+		for (vector<tabela_instrucao>::iterator it_i = tabela_instrucao_vector.begin(); it_i != tabela_instrucao_vector.end(); ++it_i)
+		{
+			if (!str.compare((*it_i).mnemonico))
+			{ //se for uma instruçao ele atualiza o valor do PC e diz que ja encontrou, pra nao precisar procurar nas diretivas
+				pc = pc + (*it_i).n_operando + 1;
+				found = 1;
+			}
+		}
+		//VERIFICA SE É DIRETIVA
+		if (!found)
+		{
+			if (!str.compare("CONST"))
+			{
+				++pc;
+			}
+			else
+			{
+				if (!str.compare("SPACE"))
+				{
+					it++;
+					if (it != token_vector.end())
+					{ //atualiza pc de acordo com o que foi especificado na linah do arquivo
+						pc = pc + stoi(*it);
+						//cout << *it << endl;
+						//cout << stoi(*it) << endl;
+					}
+					else //soma so um mesmo
+						pc++;
+				}
+				else
+				{
+					if (!str.compare("SECTION"))
+					{
+						pc = pc;
+						++it;
+						str = *it;
+						if (it != token_vector.end())
+						{
+							if (!str.compare("DATA"))
+								data = n_linha;
+							data_pc = pc;
+						}
+					}
+					else
+					{
+						printf("Erro! \n Símbolo não definido. \n Linha: %d \n", n_linha);
+						cout << "String: " << str << "\n\n\n";
+					}
+				}
+			}
+		}
+		++n_linha;
+	}
+}
+
 int procura_simbolo(vector<string>::iterator it)
 { //ße existir um tabela de simbolos, percorre ela toda procurando pelo simbolo. retorna -1 caso nao encontre na tabela
 	if (tabela_simbolo_vector.size())
@@ -1973,12 +2112,246 @@ void segunda_passagem(string file_in, string file_out)
 	infile.close();
 	ofile.close();
 }
+
+void segunda_passagem1(string file_in, string file_out)
+{
+	cout << "Começando a fazer a segunda passagem no arquivo: ";
+	cout << file_in << endl;
+
+	//*******PRIMEIRA PASSAGEM*******
+	std::ifstream infile(file_in);
+	std::string line;
+	string str;
+
+	int n_linha = 1; //número da linha do programa
+	int pc = 0;		 //número do endereço equivalente
+
+	int found = 0;
+	int symbol_value;
+
+	vector<string>::iterator it;
+	vector<string>::iterator it_end;
+
+	vector<string> aux;
+	//Cria arquivo intermediario
+	ofstream ofile(file_out);
+	//While lê arquivo de entrada até o arquivo acabar
+	while (std::getline(infile, line))
+	{
+
+		//ANÁLISE LÉXICA
+		vector<string> token_vector = separate_tokens(line);
+		//lexer(token_vector, n_linha);
+
+		it = token_vector.begin();
+		it_end = token_vector.end();
+		str = *it;
+		//VERIFICA SE É LABEL
+		if (str.back() == ':')
+		{
+			if (token_vector.size() > 1) //pega o proximo token
+				++it;
+			str = *it;
+		}
+		//VERIFICA SE É INSTRUÇÃO
+		for (vector<tabela_instrucao>::iterator it_i = tabela_instrucao_vector.begin(); it_i != tabela_instrucao_vector.end(); ++it_i)
+		{
+			if (!str.compare((*it_i).mnemonico))
+			{
+				if ((!str.compare("JMP")) || (!str.compare("JMPZ")) || (!str.compare("JMPP")) || (!str.compare("JMPN")))
+				{
+					it++;
+					if ((data_pc > -1) && (procura_simbolo(it) >= data_pc))
+					{
+						printf("Erro! \n Pulo para sessão inválida. \n Linha: %d \n", n_linha);
+					}
+					it--;
+				}
+				if ((!str.compare("STORE")) || (!str.compare("INPUT")))
+				{
+					it++;
+					if (procura_simbolo_const(it))
+						printf("Erro! \n Modificação de um valor constante. \n Linha: %d \n", n_linha);
+					it--;
+				}
+				if (!str.compare("DIV"))
+				{
+					it++;
+					if (procura_simbolo_const(it))
+					{
+						if (procura_simbolo_valor_const(it) == 0)
+							printf("Erro! \n Divisão por constante igual a 0. \n Linha: %d \n", n_linha);
+					}
+					it--;
+				}
+				if (distance(it, it_end) != ((*it_i).n_operando + 1))
+				{
+					aux.push_back((*it_i).opcode);
+					printf("Erro! \n Número de operandos da instrução errado. \n Linha: %d \n", n_linha);
+					if (distance(it, it_end) > ((*it_i).n_operando + 1))
+					{
+						//tem mais operandos do que precisa
+
+						//Laço pegando proximos tokens i vezes, em que i é o # de operandos da instrução.
+						//STOP nem entra no laço (0 operandos)
+						//COPY entra no laço 2 vezes
+						//os demais entram no laço 1 vez.
+						for (int i = 0; i < (*it_i).n_operando; i++)
+						{
+							it++; //pega proximo token
+							symbol_value = procura_simbolo(it);
+							if (symbol_value == -1)
+							{
+								printf("Erro! \n Símbolo não declarado. \n Linha: %d \n", n_linha);
+								aux.push_back("ND");
+							}
+							else
+							{
+								if ((n_linha <= data) || (data == -1))
+									aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
+								else
+									printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+							}
+						}
+					}
+					else
+					{
+						for (int i = 0; i < (*it_i).n_operando; i++)
+						{
+							it++;						  //pega proximo token
+							if (it != token_vector.end()) //copy com 1 argumento é o unico que entraria aqui
+							{
+								symbol_value = procura_simbolo(it);
+								if (symbol_value == -1)
+								{
+									printf("Erro! \n Símbolo não declarado. \n Linha: %d \n", n_linha);
+									aux.push_back("ND");
+								}
+								else
+								{
+									if ((n_linha <= data) || (data == -1))
+										aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
+									else
+										printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+								}
+							}
+							else
+							{
+								aux.push_back("FA");
+							}
+						}
+					}
+				}
+				else
+				{
+					aux.push_back((*it_i).opcode); //coloca o opcode no vetor aux
+					for (int i = 0; i < (*it_i).n_operando; i++)
+					{
+						++it;
+						symbol_value = procura_simbolo(it);
+						if (symbol_value == -1)
+						{
+							printf("Erro! \n Símbolo não declarado. \n Linha: %d \n", n_linha);
+							aux.push_back("ND");
+						}
+						else
+						{
+							if ((n_linha <= data) || (data == -1))
+								aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
+							else
+								printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+						}
+					}
+				}
+				found = 1;
+			}
+		}
+		//VERIFICA SE É DIRETIVA
+		if (!found)
+		{
+			if (!str.compare("CONST"))
+			{
+				if ((n_linha >= data) && (data != -1))
+				{
+					if (distance(it, it_end) != 2)
+					{
+						printf("Erro Sintático! \n Quantidade de operandos inválida. \n Linha: %d \n", n_linha);
+					}
+					else
+					{
+						++it;
+						if ((*it).size() > 1)
+						{
+							if ((*it).find("0X") == 0)
+							{
+								aux.push_back(to_string(retorna_decimal(*it)));
+							}
+							else
+								aux.push_back(*it);
+						}
+						else
+							aux.push_back(*it);
+					}
+				}
+				else
+					printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+			}
+			else
+			{
+				if (!str.compare("SPACE"))
+				{
+					if ((n_linha >= data) && (data != -1))
+					{
+						++it;
+						if (it != token_vector.end()) //verifica se tem algum operando na diretiva space
+						{
+							for (int i = 0; i < stoi(*it); i++) //loop reservando espaço até alcançar o valor do argumento
+								aux.push_back("X");
+						}
+						else
+						{
+							aux.push_back("X");
+						}
+					}
+					else
+						printf("Erro Sintático! \n Diretiva SPACE na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+				}
+				else
+				{
+					if (str.compare("SECTION"))
+						printf("Erro! \n Instrução ou diretiva não identificada. \n Linha: %d \n", n_linha);
+				}
+			}
+		}
+		found = 0;
+		//colocar o vetor aux no arquivo final
+		for (const auto &e : aux)
+			ofile << e << " ";
+		//TODO retirar linha abaixo depois
+		//ofile << endl;
+
+		++n_linha;
+		token_vector.clear();
+		aux.clear();
+	}
+	infile.close();
+	ofile.close();
+}
+
 void montagem(string filein, string fileout)
 {
 	inicia_tabela_diretiva();
 	inicia_tabela_instrucao();
 	primeira_passagem(filein);
 	segunda_passagem(filein, fileout);
+}
+
+void montagem1(string filein, string fileout)
+{
+	inicia_tabela_diretiva();
+	inicia_tabela_instrucao();
+	primeira_passagem1(filein);
+	segunda_passagem1(filein, fileout);
 }
 
 int main(int argc, char *argv[])
@@ -1992,12 +2365,13 @@ int main(int argc, char *argv[])
 	string file_in;
 	int lineachousection;
 
-	if(argc == 1){
+	if (argc == 1)
+	{
 		cout << "ERRO!!! Chamada errada de Programa, deve ter pelo menos 1 arquivo especificado na chamada do sistema..." << endl;
 		return 0;
 	}
 
-	if ((string(argv[1]) == "-o")||(string(argv[1]) == "-p")||(string(argv[1]) == "-m"))
+	if ((string(argv[1]) == "-o") || (string(argv[1]) == "-p") || (string(argv[1]) == "-m"))
 	{
 		if (argc != 4)
 		{
@@ -2049,19 +2423,47 @@ int main(int argc, char *argv[])
 		{
 			cout << "\nERRO.\nComando de execução inválido." << endl;
 		}
-	}else{
-		if ((argc > 3)||(argc < 2))
+	}
+	else
+	{
+		if ((argc > 3) || (argc < 2))
 		{
 			cout << "\nERRO.\nNúmero de argumentos inválidos! " << endl;
 			return 0;
 		}
 
-		if(argc == 2){
+		if (argc == 2)
+		{
 			cout << "Faz a saída do ligador para 1 arquivo" << endl;
 			//Descobrir como fazer 1 arquivo do ligador
+			//Chama o programa de montagem que temos hoje sem o begin e end, se tiver mostra um erro
+			//Verifica se existe extern e public(retorna erro?? Perguntar para o professor)
+			//Se possível já vai salvando a tabela de definição e uso de símbolos para o primeiro arquivo
+			//monta os diversos arquivos em um único arquivo de saída
+
+			file_name = argv[1]; // passar para learquivo(). eh o nome do arquivo .asm.
+			file_in = file_name + ".asm";
+			cout << file_in << endl;
+			if (!file_exist(file_in))
+			{
+				cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+				return 0;
+			}
+
+			//lerarquivo(argv[2],argv[3]);
+			lineachousection = lerarquivo(file_in, argv[1]);
+			pre_procesamento(argv[1], lineachousection);
+			expande_macro(argv[1]);
+			//FUNÇOES DA MONTAGEM
+			string file_ = argv[1];
+			file_in = file_ + ".mcr";
+			string file_out = file_ + ".o"; //todo trocar pra '.o'
+			montagem1(file_in, file_out);
+			//Realiza a montagem do código depois de expandir as macros
 		}
-		else if(argc == 3){
-			
+		else if (argc == 3)
+		{
+
 			cout << "Faz a saída do ligador para 2 arquivos" << endl;
 			//Descobrir como fazer para 2 arquivos depois de ter feito para 1 arquivo
 			file_name = argv[2]; // passar para learquivo(). eh o nome do arquivo .asm.
@@ -2071,7 +2473,6 @@ int main(int argc, char *argv[])
 			cout << file_name << endl;
 			cout << file_in << endl;
 		}
-
 	}
 
 	return 0;

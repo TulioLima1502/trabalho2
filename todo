@@ -2,6 +2,8 @@ TODO    Definir o que é necessário para fazer a saída do arquivo ligado uma v
     TODO    Fazer a contagem de linha do arquivo objeto no header
     TODO    Nome do programa no header
     TODO    Informações que são relativas no arquivo objeto
+    TODO    Enquanto faz a primeira passagem, se encontrar as diretivas BEGIN e END(Retorna um erro?)
+    TODO    E a cada nova linha ir construindo a tabela de definição e a tabela de uso(verificar se é aqui mesmo que essas tabelas são construidas)
 
 TODO    Depois de feito para apenas 1 arquivo, fazer para dois arquivos
     TODO    Pesquisar o que é externo e o que é publico e fazer modificações nas funções que temos hoje para salvar essas informações apenas quando a ligação for para dois programas(pode ser uma flag que ativa a criação dessas tabelas ou mesmo uma nova função)

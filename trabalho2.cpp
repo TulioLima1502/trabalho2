@@ -1508,6 +1508,7 @@ void lexer(std::vector<std::string> token_vector, int n_linha)
 		if ((*it).size() < 21)
 		{
 			string str = *it;
+			cout << str << endl;
 			if (isalpha(str.at(0)) || (str.at(0) == '_'))
 			{
 				for (string::iterator it3 = str.begin(); it3 != str.end(); ++it3)
@@ -1520,11 +1521,7 @@ void lexer(std::vector<std::string> token_vector, int n_linha)
 							if (!((it == token_vector.begin()) && ((*it).back() == (*it3))))
 								printf("Erro léxico! \n Token inválido. Token deve ser composto por dígitos, letras ou underscore. \n Linha: %d.", n_linha);
 						}
-						else
-						{
-							printf("Erro léxico! \n Token inválido. Token deve ser composto por dígitos, letras ou underscore. \n Linha: %d.", n_linha);
-							break;
-						}
+
 					}
 				}
 			}
@@ -1711,6 +1708,7 @@ void primeira_passagem1(string file_in)
 
 	int n_linha = 1; //número da linha do programa
 	int pc = 0;		 //número do endereço equivalente
+	int flag;
 
 	int simbolo_redefinido = 0;
 	int found = 0;
@@ -1722,14 +1720,17 @@ void primeira_passagem1(string file_in)
 	//While lê arquivo de entrada até o arquivo acabar
 	while (std::getline(infile, line))
 	{
-
+		flag = 0;
 		//ANÁLISE LÉXICA
 		//separa os tokens e faz análise léxica
+		cout << line << endl;
+		cout << "Linha do .pre" << endl;
 		vector<string> token_vector = separate_tokens(line);
+		//cout << token_vector.begin() << endl;
 		lexer(token_vector, n_linha);
-
 		it = token_vector.begin();
 		str = *it;
+
 		//VERIFICA SE É LABEL
 		found = 0;
 		if (str.back() == ':') //procura no fim do primeiro token ':'
@@ -1789,11 +1790,13 @@ void primeira_passagem1(string file_in)
 			{ //se for uma instruçao ele atualiza o valor do PC e diz que ja encontrou, pra nao precisar procurar nas diretivas
 				pc = pc + (*it_i).n_operando + 1;
 				found = 1;
+				cout << "encontrou a definição de operação" << endl;
 			}
 		}
 		//VERIFICA SE É DIRETIVA
 		if (!found)
 		{
+
 			if (!str.compare("CONST"))
 			{
 				++pc;
@@ -1824,6 +1827,9 @@ void primeira_passagem1(string file_in)
 							if (!str.compare("DATA"))
 								data = n_linha;
 							data_pc = pc;
+							cout << "isso aqui" << endl;
+							cout << data << endl;
+							cout << data_pc << endl;
 						}
 					}
 					else
@@ -1836,6 +1842,7 @@ void primeira_passagem1(string file_in)
 		}
 		++n_linha;
 	}
+
 }
 
 int procura_simbolo(vector<string>::iterator it)
@@ -2453,10 +2460,10 @@ int main(int argc, char *argv[])
 			//lerarquivo(argv[2],argv[3]);
 			lineachousection = lerarquivo(file_in, argv[1]);
 			pre_procesamento(argv[1], lineachousection);
-			expande_macro(argv[1]);
+			//expande_macro(argv[1]);
 			//FUNÇOES DA MONTAGEM
 			string file_ = argv[1];
-			file_in = file_ + ".mcr";
+			file_in = file_ + ".pre";
 			string file_out = file_ + ".o"; //todo trocar pra '.o'
 			montagem1(file_in, file_out);
 			//Realiza a montagem do código depois de expandir as macros

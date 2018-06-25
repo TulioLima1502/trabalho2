@@ -63,6 +63,13 @@ typedef struct tabela_diretiva
 	int n_operando;
 } tabela_diretiva;
 
+typedef struct tabela_definicoes
+{
+	string simbolo;
+	int valor;
+} tabela_definicoes;
+
+
 //DEFINIÇÃO DAS TABELAS
 vector<tabela_simbolo> tabela_simbolo_vector;
 
@@ -70,9 +77,12 @@ vector<tabela_instrucao> tabela_instrucao_vector;
 
 vector<tabela_diretiva> tabela_diretiva_vector;
 
+vector<tabela_definicoes> tabela_definicoes_vector;
+
 //VARIÁVEL GLOBAL AUXILIAR
 int data = -1;
 int data_pc = -1;
+
 
 //INICIALIZAÇÃO DAS TABELAS
 //*****TABELA DE INSTRUÇÕES
@@ -1557,6 +1567,67 @@ void definir_label(string str, int n_address)
 	tabela_simbolo_vector.push_back(temp);
 }
 
+
+void insere_tabela_definicoes(string str, int pc)
+{ //Percorre tabela de definiçoes, se encontrou atualiza, se não encontrou insere
+	int encontrou = 0;
+
+	vector<tabela_definicoes>::iterator it_s;
+
+	if (tabela_definicoes_vector.size())
+	{
+		for (it_s = tabela_definicoes_vector.begin(); it_s != tabela_definicoes_vector.end(); ++it_s)
+		{
+			if (!str.compare((*it_s).simbolo))
+			{
+				encontrou = 1;
+				break;
+			}
+		}
+	}
+	if (!encontrou)
+	{
+		tabela_definicoes temp2;
+
+		temp2.simbolo = str;
+		temp2.valor = pc;
+		tabela_definicoes_vector.push_back(temp2);
+	}
+	else
+	{ //se encontrou na tabela
+		cout << "\nERRO.\nSímbolo já declarado!\n\n";
+	}
+}
+
+void atualiza_tabela_definicoes(string str, int pc)
+{ //Percorre tabela de definiçoes, se encontrou atualiza, se não encontrou insere
+	int encontrou = 0;
+
+	vector<tabela_definicoes>::iterator it_s;
+
+	if (tabela_definicoes_vector.size())
+	{
+		for (it_s = tabela_definicoes_vector.begin(); it_s != tabela_definicoes_vector.end(); ++it_s)
+		{
+			if (!str.compare((*it_s).simbolo))
+			{
+				encontrou = 1;
+				break;
+			}
+		}
+	}
+	if (encontrou)
+	{
+		if(pc == -1)
+			(*it_s).valor = pc;
+		else
+			cout << "\nERRO.\nSímbolo já definido!\n\n";
+	}
+	//se nao encontrou, so ignora, deve ser simbolo do proprio modulo entao 
+}
+
+
+
 void primeira_passagem(string file_in, int n_files)
 {
 	cout << "Começando a fazer a primeira passagem no arquivo: ";
@@ -1572,6 +1643,9 @@ void primeira_passagem(string file_in, int n_files)
 
 	int simbolo_redefinido = 0;
 	int found = 0;
+
+	int found_begin = 0;
+	int found_end = 0;
 
 	vector<string>::iterator it;
 
@@ -1592,6 +1666,7 @@ void primeira_passagem(string file_in, int n_files)
 		found = 0;
 		if (str.back() == ':') //procura no fim do primeiro token ':'
 		{
+			//TODO INSERIR NA TABELA DE DEFINIÇOES DO PUBLIC TAMBEM
 			str.erase(std::prev(str.end())); //apaga o ':'
 			if (token_vector.size())
 			{
@@ -1688,9 +1763,10 @@ void primeira_passagem(string file_in, int n_files)
 					{
 						if (!str.compare("BEGIN"))
 						{
+							found_begin = 1;
 							if (n_files == 2)
 							{
-								//pode ter begin
+								pc = pc;
 								//TODO implementar
 							}
 							else
@@ -1702,9 +1778,10 @@ void primeira_passagem(string file_in, int n_files)
 						{
 							if (!str.compare("END"))
 							{
+								found_end = 1;
 								if (n_files == 2)
 								{
-									//pode ter END
+									pc = pc;
 									//TODO implementar
 								}
 								else
@@ -1717,12 +1794,20 @@ void primeira_passagem(string file_in, int n_files)
 								if (!str.compare("PUBLIC"))
 								{
 									//TODO implementar public
+									pc=pc;
+									++it;
+									str = *it;
+									insere_tabela_definicoes(str, -1); //pc = -1 pra indicar que não tem valor
 								}
 								else
 								{
 									if (!str.compare("EXTERN"))
 									{
-										//TODO implementar EXTERN
+
+										pc=pc;
+										++it;
+										str = *it;
+										//chamar outra função
 									}	
 									else
 									{
@@ -1738,7 +1823,15 @@ void primeira_passagem(string file_in, int n_files)
 		}
 		++n_linha;
 	}
+	if  (n_files == 2)
+	{
+		if (!found_begin)
+			cout << "Erro! \n Diretiva BEGIN não encontrada. \n";
+		if (!found_end)
+			cout << "Erro! \n Diretiva END não encontrada. \n";
+	}
 }
+
 
 int procura_simbolo(vector<string>::iterator it)
 { //ße existir um tabela de simbolos, percorre ela toda procurando pelo simbolo. retorna -1 caso nao encontre na tabela
@@ -2007,7 +2100,7 @@ void segunda_passagem(string file_in, string file_out)
 						}
 						else
 						{
-							if ( (str.compare("SECTION") && (str.compare("BEGIN")  &&  (str.compare("END"))
+							if ( str.compare("SECTION") && str.compare("BEGIN")  &&  str.compare("END") )
 								printf("Erro! \n Instrução ou diretiva não identificada. \n Linha: %d \n", n_linha);		
 						}
 					}

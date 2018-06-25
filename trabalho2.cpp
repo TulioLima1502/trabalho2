@@ -1568,38 +1568,38 @@ void definir_label(string str, int n_address)
 }
 
 
-void insere_tabela_definicoes(string str, int pc)
+void insere_tabela_definicoes(string str)
 { //Percorre tabela de definiçoes, se encontrou atualiza, se não encontrou insere
 	int encontrou = 0;
 
-	vector<tabela_definicoes>::iterator it_s;
+	vector<tabela_simbolo>::iterator it_s;
 
-	if (tabela_definicoes_vector.size())
+	for (it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
 	{
-		for (it_s = tabela_definicoes_vector.begin(); it_s != tabela_definicoes_vector.end(); ++it_s)
-		{
-			if (!str.compare((*it_s).simbolo))
-			{
-				encontrou = 1;
-				break;
-			}
-		}
+		if (!str.compare((*it_s).simbolo))
+			encontrou = 1;
 	}
-	if (!encontrou)
+
+	if (encontrou)
 	{
 		tabela_definicoes temp2;
+		temp2.simbolo = (*it_s).simbolo;
 
-		temp2.simbolo = str;
-		temp2.valor = pc;
+		if ((*it_s).is_const == 1)
+		{
+			temp2.valor = (*it_s).valor_const;
+		}
+		else
+			temp2.valor = (*it_s).valor;
+
 		tabela_definicoes_vector.push_back(temp2);
+
 	}
 	else
-	{ //se encontrou na tabela
-		cout << "\nERRO.\nSímbolo já declarado!\n\n";
-	}
+		cout << "\nERRO.\nSímbolo não declarado!\n\n";
 }
 
-void atualiza_tabela_definicoes(string str, int pc)
+/*void atualiza_tabela_definicoes(string str, int pc)
 { //Percorre tabela de definiçoes, se encontrou atualiza, se não encontrou insere
 	int encontrou = 0;
 
@@ -1618,13 +1618,10 @@ void atualiza_tabela_definicoes(string str, int pc)
 	}
 	if (encontrou)
 	{
-		if(pc == -1)
-			(*it_s).valor = pc;
-		else
-			cout << "\nERRO.\nSímbolo já definido!\n\n";
+		(*it_s).valor = pc;
 	}
 	//se nao encontrou, so ignora, deve ser simbolo do proprio modulo entao 
-}
+}*/
 
 
 
@@ -1666,7 +1663,6 @@ void primeira_passagem(string file_in, int n_files)
 		found = 0;
 		if (str.back() == ':') //procura no fim do primeiro token ':'
 		{
-			//TODO INSERIR NA TABELA DE DEFINIÇOES DO PUBLIC TAMBEM
 			str.erase(std::prev(str.end())); //apaga o ':'
 			if (token_vector.size())
 			{
@@ -1682,7 +1678,9 @@ void primeira_passagem(string file_in, int n_files)
 					//str.erase(std::prev(str.end()));
 					definir_label(str, pc); //inclui arquivo na tabela
 				}
+
 			}
+
 			if (token_vector.size() > 1) //evitar seg fault
 				++it;					 //pega o proximo token da linha do arquivo
 			str = *it;
@@ -1797,7 +1795,7 @@ void primeira_passagem(string file_in, int n_files)
 									pc=pc;
 									++it;
 									str = *it;
-									insere_tabela_definicoes(str, -1); //pc = -1 pra indicar que não tem valor
+									//insere_tabela_definicoes(str, -1); //pc = -1 pra indicar que não tem valor
 								}
 								else
 								{
@@ -2090,7 +2088,9 @@ void segunda_passagem(string file_in, string file_out)
 				{
 					if (!str.compare("PUBLIC"))
 					{
-
+						++it;
+						str = *it;
+						insere_tabela_definicoes(str);
 					}
 					else
 					{

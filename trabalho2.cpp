@@ -1557,7 +1557,7 @@ void definir_label(string str, int n_address)
 	tabela_simbolo_vector.push_back(temp);
 }
 
-void primeira_passagem(string file_in)
+void primeira_passagem(string file_in, int n_files)
 {
 	cout << "Começando a fazer a primeira passagem no arquivo: ";
 	cout << file_in << endl;
@@ -1686,8 +1686,52 @@ void primeira_passagem(string file_in)
 					}
 					else
 					{
-						printf("Erro! \n Símbolo não definido. \n Linha: %d \n", n_linha);
-						cout << "String: " << str << "\n\n\n";
+						if (!str.compare("BEGIN"))
+						{
+							if (n_files == 2)
+							{
+								//pode ter begin
+								//TODO implementar
+							}
+							else
+							{
+								printf("Erro! \n Diretiva BEGIN não é válida para apenas um arquivo. \n Linha: %d \n", n_linha);
+							}
+						}
+						else
+						{
+							if (!str.compare("END"))
+							{
+								if (n_files == 2)
+								{
+									//pode ter END
+									//TODO implementar
+								}
+								else
+								{
+									printf("Erro! \n Diretiva END não é válida para apenas um arquivo. \n Linha: %d \n", n_linha);
+								}
+							}
+							else
+							{
+								if (!str.compare("PUBLIC"))
+								{
+									//TODO implementar public
+								}
+								else
+								{
+									if (!str.compare("EXTERN"))
+									{
+										//TODO implementar EXTERN
+									}	
+									else
+									{
+										printf("Erro! \n Símbolo não definido. \n Linha: %d \n", n_linha);
+										cout << "String: " << str << "\n\n\n";
+									}
+								}		
+							}
+						}	
 					}
 				}
 			}
@@ -1951,8 +1995,22 @@ void segunda_passagem(string file_in, string file_out)
 				}
 				else
 				{
-					if (str.compare("SECTION"))
-						printf("Erro! \n Instrução ou diretiva não identificada. \n Linha: %d \n", n_linha);
+					if (!str.compare("PUBLIC"))
+					{
+
+					}
+					else
+					{
+						if (!str.compare("EXTERN"))
+						{
+
+						}
+						else
+						{
+							if ( (str.compare("SECTION") && (str.compare("BEGIN")  &&  (str.compare("END"))
+								printf("Erro! \n Instrução ou diretiva não identificada. \n Linha: %d \n", n_linha);		
+						}
+					}
 				}
 			}
 		}
@@ -1976,7 +2034,7 @@ void montagem(string filein, string fileout, int n_files)
 {
 	inicia_tabela_diretiva();
 	inicia_tabela_instrucao();
-	primeira_passagem(filein);
+	primeira_passagem(filein, n_files);
 	segunda_passagem(filein, fileout);
 }
 
@@ -2086,7 +2144,7 @@ int main(int argc, char *argv[])
 			//expande_macro(argv[1]);
 			//FUNÇOES DA MONTAGEM
 			string file_ = argv[1];
-			file_in = file_ + ".pre";
+			file_in = file_ + ".mcr";
 			string file_out = file_ + ".o"; //todo trocar pra '.o'
 			montagem(file_in, file_out, n_files);
 			//Realiza a montagem do código depois de expandir as macros

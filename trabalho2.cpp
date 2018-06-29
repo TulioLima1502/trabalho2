@@ -48,6 +48,7 @@ typedef struct tabela_simbolo
 	int valor;
 	int is_const;
 	int valor_const;
+	int is_extern;
 } tabela_simbolo;
 
 typedef struct tabela_instrucao
@@ -70,6 +71,12 @@ typedef struct tabela_definicoes
 } tabela_definicoes;
 
 
+typedef struct tabela_uso
+{
+	string simbolo;
+	int endereco;
+} tabela_uso;
+
 //DEFINIÇÃO DAS TABELAS
 vector<tabela_simbolo> tabela_simbolo_vector;
 
@@ -78,6 +85,8 @@ vector<tabela_instrucao> tabela_instrucao_vector;
 vector<tabela_diretiva> tabela_diretiva_vector;
 
 vector<tabela_definicoes> tabela_definicoes_vector;
+
+vector<tabela_uso> tabela_uso_vector;
 
 //VARIÁVEL GLOBAL AUXILIAR
 int data = -1;
@@ -1564,6 +1573,7 @@ void definir_label(string str, int n_address)
 	temp.valor = n_address;
 	temp.is_const = 0;
 	temp.valor_const = -1;
+	temp.is_extern = 0;
 	tabela_simbolo_vector.push_back(temp);
 }
 
@@ -1599,30 +1609,85 @@ void insere_tabela_definicoes(string str)
 		cout << "\nERRO.\nSímbolo não declarado!\n\n";
 }
 
-/*void atualiza_tabela_definicoes(string str, int pc)
+void cria_tabela_uso(string str)
 { //Percorre tabela de definiçoes, se encontrou atualiza, se não encontrou insere
-	int encontrou = 0;
+	tabela_uso temp2;
 
-	vector<tabela_definicoes>::iterator it_s;
+	temp2.simbolo = str;
+	temp2.endereco = -1;
 
-	if (tabela_definicoes_vector.size())
+	tabela_uso_vector.push_back(temp2);
+}
+
+void passagem_extern(string file_in)
+{
+	cout << "Começando a fazer a passagem extern no arquivo: ";
+	cout << file_in << endl;
+
+	//*******PRIMEIRA PASSAGEM*******
+	std::ifstream infile(file_in);
+	std::string line;
+	string str;
+
+	vector<string>::iterator it;
+
+	//Cria arquivo intermediario
+	//ofstream ofile("file_inter.txt");
+	//While lê arquivo de entrada até o arquivo acabar
+	while (std::getline(infile, line))
 	{
-		for (it_s = tabela_definicoes_vector.begin(); it_s != tabela_definicoes_vector.end(); ++it_s)
+		vector<string> token_vector = separate_tokens(line);
+
+		for (vector<string>::iterator it = token_vector.begin(); it != token_vector.end(); it++)
 		{
-			if (!str.compare((*it_s).simbolo))
+			str = *it;
+			if (!str.compare("EXTERN"))
 			{
-				encontrou = 1;
+				it--;
+				str = *it;
+				str.erase(std::prev(str.end())); //apaga o ':'
+				cria_tabela_uso(str);
+
 				break;
 			}
 		}
 	}
+}
+
+
+void procura_uso(string str, int pc)
+{ //Percorre tabela de definiçoes, se encontrou atualiza, se não encontrou insere
+	int encontrou = 0;
+
+	vector<tabela_uso>::iterator it_s;
+
+	for (it_s = tabela_uso_vector.begin(); it_s != tabela_uso_vector.end(); ++it_s)
+	{
+		if (!str.compare((*it_s).simbolo))
+		{
+			encontrou = 1;
+			break;
+		}
+	}
+
 	if (encontrou)
 	{
-		(*it_s).valor = pc;
-	}
-	//se nao encontrou, so ignora, deve ser simbolo do proprio modulo entao 
-}*/
 
+		if ((*it_s).endereco == -1)
+		{
+			(*it_s).endereco = pc;
+		}
+		else
+		{
+			tabela_uso temp2;
+			temp2.simbolo = str;
+			temp2.endereco = pc;
+			tabela_uso_vector.push_back(temp2);
+		}
+	}
+	else
+		cout << "\nERRO.\nSímbolo não declarado!\n\n";
+}
 
 
 void primeira_passagem(string file_in, int n_files)
@@ -1644,7 +1709,12 @@ void primeira_passagem(string file_in, int n_files)
 	int found_begin = 0;
 	int found_end = 0;
 
+	int pc_aux;
+
 	vector<string>::iterator it;
+
+	//TODO descomentar isso para criar a tabela de uso
+	//passagem_extern(file_in)
 
 	//Cria arquivo intermediario
 	//ofstream ofile("file_inter.txt");
@@ -1712,13 +1782,52 @@ void primeira_passagem(string file_in, int n_files)
 				it++;
 				str = *it;
 			}
+
+			if (!str.compare("EXTERN"))
+			{
+				it--;
+				str = *it;
+				str.erase(std::prev(str.end()));
+				for (vector<tabela_simbolo>::iterator it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
+				{
+					if (!str.compare((*it_s).simbolo))
+					{
+						(*it_s).is_extern = 1;
+						(*it_s).valor = -1; //TODO corrigir ese valor?
+						break;
+					}
+				}
+				it++;
+				str = *it;
+			}
+
 		}
 		//VERIFICA SE É INSTRUÇÃO
 		for (vector<tabela_instrucao>::iterator it_i = tabela_instrucao_vector.begin(); it_i != tabela_instrucao_vector.end(); ++it_i)
 		{
 			if (!str.compare((*it_i).mnemonico))
 			{ //se for uma instruçao ele atualiza o valor do PC e diz que ja encontrou, pra nao precisar procurar nas diretivas
+				pc_aux = pc + 1; //endereço da instrução
 				pc = pc + (*it_i).n_operando + 1;
+				
+				if ( (*it_i).n_operando )
+				{
+					//pega o operando e vê se ele existe na tabela de uso
+					pc_aux++; //endereço do 1º operando
+					it++;
+					str = *it;
+					procura_uso(str, pc_aux );
+					
+					if ( (*it_i).n_operando == 2)
+					{
+						pc_aux++;
+						it++;
+						str = *it;
+						procura_uso(str,pc_aux );
+					}
+				}
+				//else seria um stop
+
 				found = 1;
 			}
 		}
@@ -1832,7 +1941,7 @@ void primeira_passagem(string file_in, int n_files)
 
 
 int procura_simbolo(vector<string>::iterator it)
-{ //ße existir um tabela de simbolos, percorre ela toda procurando pelo simbolo. retorna -1 caso nao encontre na tabela
+{ //ße existir um tabela de simbolos, percorre ela toda procurando pelo simbolo. retorna -2 caso nao encontre na tabela
 	if (tabela_simbolo_vector.size())
 	{
 		for (vector<tabela_simbolo>::iterator it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
@@ -1842,10 +1951,10 @@ int procura_simbolo(vector<string>::iterator it)
 				return (*it_s).valor;
 			}
 		}
-		return -1;
+		return -2;
 	}
 	else
-		return -1;
+		return -2;
 }
 
 int procura_simbolo_const(vector<string>::iterator it)
@@ -1880,6 +1989,7 @@ int procura_simbolo_valor_const(vector<string>::iterator it)
 	else
 		return -1;
 }
+
 
 void segunda_passagem(string file_in, string file_out)
 {
@@ -1968,8 +2078,9 @@ void segunda_passagem(string file_in, string file_out)
 						{
 							it++; //pega proximo token
 							symbol_value = procura_simbolo(it);
-							if (symbol_value == -1)
+							if (symbol_value == -2)
 							{
+								//estou aqui
 								printf("Erro! \n Símbolo não declarado. \n Linha: %d \n", n_linha);
 								aux.push_back("ND");
 							}

@@ -1566,14 +1566,14 @@ void lexer(std::vector<std::string> token_vector, int n_linha)
 	}
 }
 
-void definir_label(string str, int n_address)
+void definir_label(string str, int n_address, int is_extern)
 {
 	tabela_simbolo temp;
 	temp.simbolo = str;
 	temp.valor = n_address;
 	temp.is_const = 0;
 	temp.valor_const = -1;
-	temp.is_extern = 0;
+	temp.is_extern = is_extern;
 	tabela_simbolo_vector.push_back(temp);
 }
 
@@ -1714,7 +1714,7 @@ void primeira_passagem(string file_in, int n_files)
 	vector<string>::iterator it;
 
 	//TODO descomentar isso para criar a tabela de uso
-	//passagem_extern(file_in)
+	passagem_extern(file_in);
 
 	//Cria arquivo intermediario
 	//ofstream ofile("file_inter.txt");
@@ -1746,7 +1746,9 @@ void primeira_passagem(string file_in, int n_files)
 				if (!simbolo_redefinido)
 				{
 					//str.erase(std::prev(str.end()));
-					definir_label(str, pc); //inclui arquivo na tabela
+					//GUIA INCLUI NA TABELA DE SIMBOLOS
+					//SIMBOLO SENDO DEFINIDO NO PROGRAMA
+					definir_label(str, pc, 0); //inclui na tabela
 				}
 
 			}
@@ -1783,7 +1785,8 @@ void primeira_passagem(string file_in, int n_files)
 				str = *it;
 			}
 
-			if (!str.compare("EXTERN"))
+			
+		/*	if (!str.compare("EXTERN"))
 			{
 				it--;
 				str = *it;
@@ -1799,7 +1802,7 @@ void primeira_passagem(string file_in, int n_files)
 				}
 				it++;
 				str = *it;
-			}
+			}*/
 
 		}
 		//VERIFICA SE É INSTRUÇÃO
@@ -1810,6 +1813,8 @@ void primeira_passagem(string file_in, int n_files)
 				pc_aux = pc + 1; //endereço da instrução
 				pc = pc + (*it_i).n_operando + 1;
 				
+				//GUIA CORRIGIR TABELA DE USO
+				//CASO DO SIMBOLO EXTERNO PÓS-INSTRUÇÃO
 				if ( (*it_i).n_operando )
 				{
 					//pega o operando e vê se ele existe na tabela de uso
@@ -1817,6 +1822,8 @@ void primeira_passagem(string file_in, int n_files)
 					it++;
 					str = *it;
 					procura_uso(str, pc_aux );
+					//declarar isso na tabela de simbolos tambem
+					//definir_label(str,pc_aux);
 					
 					if ( (*it_i).n_operando == 2)
 					{
@@ -1900,6 +1907,8 @@ void primeira_passagem(string file_in, int n_files)
 							{
 								if (!str.compare("PUBLIC"))
 								{
+									//GUIA ATUALIZA TABELA DE DEFINIÇAO
+									//CASO DO SIMBOLO DECLARADO COMO PUBLIC
 									//TODO implementar public
 									pc=pc;
 									++it;
@@ -2173,7 +2182,7 @@ void segunda_passagem(string file_in, string file_out)
 					}
 				}
 				else
-					printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+					printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); 
 			}
 			else
 			{
@@ -2193,7 +2202,7 @@ void segunda_passagem(string file_in, string file_out)
 						}
 					}
 					else
-						printf("Erro Sintático! \n Diretiva SPACE na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+						printf("Erro Sintático! \n Diretiva SPACE na sessão errada. \n Linha: %d \n", n_linha); 
 				}
 				else
 				{
@@ -2222,8 +2231,6 @@ void segunda_passagem(string file_in, string file_out)
 		//colocar o vetor aux no arquivo final
 		for (const auto &e : aux)
 			ofile << e << " ";
-		//TODO retirar linha abaixo depois
-		//ofile << endl;
 
 		++n_linha;
 		token_vector.clear();

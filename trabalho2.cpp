@@ -1578,35 +1578,59 @@ void definir_label(string str, int n_address, int is_extern)
 }
 
 
-void insere_tabela_definicoes(string str)
-{ //Percorre tabela de definiçoes, se encontrou atualiza, se não encontrou insere
+void insere_tabela_definicoes(string str) //string depois de um PUBLIC
+{ //Percorre tabela de definiçoes.
+  //Se a string já existe, erro.
+  //Se não existe é inserida com valor -1
 	int encontrou = 0;
 
-	vector<tabela_simbolo>::iterator it_s;
+	vector<tabela_definicoes>::iterator it_s;
 
-	for (it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
+	for (it_s = tabela_definicoes_vector.begin(); it_s != tabela_definicoes_vector.end(); ++it_s)
 	{
 		if (!str.compare((*it_s).simbolo))
+		{
 			encontrou = 1;
+			break;
+		}
+	}
+	if (!encontrou)
+	{
+		tabela_definicoes temp2;
+		temp2.simbolo = str;
+		temp2.valor = -1;
+
+		tabela_definicoes_vector.push_back(temp2);
+	}
+	else
+		cout << "\nERRO.\nSímbolo redeclarado!\n\n";
+}
+
+void verifica_se_public(string str, int pc) //Encontra uma definição de label
+//Verifica se essa label é está na tabela de definições
+//Se estiver e o valor de endereço for -1, corrige
+//Se o endereço for outro, símbolo redeclarado.
+{
+	int encontrou = 0;
+
+	vector<tabela_definicoes>::iterator it_s;
+
+	for (it_s = tabela_definicoes_vector.begin(); it_s != tabela_definicoes_vector.end(); ++it_s)
+	{
+		if (!str.compare((*it_s).simbolo))
+		{
+			encontrou = 1;
+			break;
+		}
 	}
 
 	if (encontrou)
 	{
-		tabela_definicoes temp2;
-		temp2.simbolo = (*it_s).simbolo;
-
-		if ((*it_s).is_const == 1)
-		{
-			temp2.valor = (*it_s).valor_const;
-		}
+		if ( (*it_s).valor == -1 )
+			(*it_s).valor = pc;
 		else
-			temp2.valor = (*it_s).valor;
-
-		tabela_definicoes_vector.push_back(temp2);
-
+			cout << "\nERRO.\nSímbolo redeclarado!\n\n";
 	}
-	else
-		cout << "\nERRO.\nSímbolo não declarado!\n\n";
 }
 
 void cria_tabela_uso(string str)
@@ -1690,6 +1714,7 @@ void procura_uso(string str, int pc)
 }
 
 
+
 void primeira_passagem(string file_in, int n_files)
 {
 	cout << "Começando a fazer a primeira passagem no arquivo: ";
@@ -1736,6 +1761,7 @@ void primeira_passagem(string file_in, int n_files)
 			str.erase(std::prev(str.end())); //apaga o ':'
 			if (token_vector.size())
 			{
+
 				//percorre toda a tabela de simbolos  comparando o token do arquivo com o simbolo definido na tabela
 				for (vector<tabela_simbolo>::iterator it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
 					if (!str.compare((*it_s).simbolo)) //ja está definido na tabela
@@ -1745,12 +1771,13 @@ void primeira_passagem(string file_in, int n_files)
 					}
 				if (!simbolo_redefinido)
 				{
+					//pc++; //TODO PENSAR SE O PC TA CORRETO corrigir 
 					//str.erase(std::prev(str.end()));
 					//GUIA INCLUI NA TABELA DE SIMBOLOS
 					//SIMBOLO SENDO DEFINIDO NO PROGRAMA
 					definir_label(str, pc, 0); //inclui na tabela
+					verifica_se_public(str, pc);
 				}
-
 			}
 
 			if (token_vector.size() > 1) //evitar seg fault
@@ -1913,7 +1940,7 @@ void primeira_passagem(string file_in, int n_files)
 									pc=pc;
 									++it;
 									str = *it;
-									//insere_tabela_definicoes(str, -1); //pc = -1 pra indicar que não tem valor
+									insere_tabela_definicoes(str); //pc = -1 pra indicar que não tem valor
 								}
 								else
 								{
@@ -2210,7 +2237,7 @@ void segunda_passagem(string file_in, string file_out)
 					{
 						++it;
 						str = *it;
-						insere_tabela_definicoes(str);
+						//insere_tabela_definicoes(str);
 					}
 					else
 					{

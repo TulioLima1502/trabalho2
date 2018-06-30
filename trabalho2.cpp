@@ -1607,10 +1607,10 @@ void insere_tabela_definicoes(string str) //string depois de um PUBLIC
 }
 
 void verifica_se_public(string str, int pc) //Encontra uma definição de label
-//Verifica se essa label é está na tabela de definições
-//Se estiver e o valor de endereço for -1, corrige
-//Se o endereço for outro, símbolo redeclarado.
 {
+	//Verifica se essa label é está na tabela de definições
+	//Se estiver e o valor de endereço for -1, corrige
+	//Se o endereço for outro, símbolo redeclarado.
 	int encontrou = 0;
 
 	vector<tabela_definicoes>::iterator it_s;
@@ -1709,8 +1709,6 @@ void procura_uso(string str, int pc)
 			tabela_uso_vector.push_back(temp2);
 		}
 	}
-	else
-		cout << "\nERRO.\nSímbolo não declarado!\n\n";
 }
 
 

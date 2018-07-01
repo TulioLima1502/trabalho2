@@ -177,9 +177,9 @@ void ligador2(string file_1, string file_2)
 	//***********************************
 	//COPIA CABEÇALHO DO SEGUNDO ARQUIVO
 	//***********************************
-	file_in = file_2 + ".txt"; //todo corrigir formato	
+	string file_in2 = file_2 + ".txt"; //todo corrigir formato	
 
-	std::ifstream infile2(file_in);
+	std::ifstream infile2(file_in2);
 	std::getline(infile2, line);
 	std::getline(infile2, line);
 
@@ -191,7 +191,7 @@ void ligador2(string file_1, string file_2)
 	it ++;
 	while (it != token_vector.end())
 	{
-		mapa_relocacao_vector2.push_back(stoi(*it));
+		mapa_relocacao_vector2.push_back(stoi(*it)+fator_relocacao);
 		it++;
 	}
 
@@ -206,7 +206,7 @@ void ligador2(string file_1, string file_2)
 		tabela_uso temp2;
 		temp2.simbolo = (*it);
 		it++;
-		temp2.endereco = stoi(*it);
+		temp2.endereco = stoi(*it) + fator_relocacao;
 		uso_vector2.push_back(temp2);
 		it++;
 	}
@@ -222,7 +222,7 @@ void ligador2(string file_1, string file_2)
 		tabela_definicoes temp2;
 		temp2.simbolo = (*it);
 		it++;
-		temp2.valor = stoi(*it);
+		temp2.valor = stoi(*it) + fator_relocacao;
 		definicoes_vector2.push_back(temp2);
 		it++;
 	}
@@ -252,52 +252,69 @@ void ligador2(string file_1, string file_2)
 	}
 
 
-/*
+	int pc = 0;
+	string variavel;
+	int is_uso =0;
 
-	//CORRETO ATÉ AQUI 
 	string file_out = "ligado.txt"; //TODO criar nome de saída corretamente
 	ofstream ofile(file_out);
-
-
-	//While lê arquivo de entrada até o arquivo acabar
-	while (std::getline(infile, line))
+	//************************
+	//COMEÇA A LIGAR ARQUIVO 1
+	//************************
+	std::ifstream infile3(file_in);
+	while (std::getline(infile3, line))
 	{
-		vector<string> token_vector = separate_tokens(line);
-
-		vector<string>::iterator it = token_vector.begin();
+		cout << "entrou no while" << endl;
+		token_vector = separate_tokens(line);
+		it = token_vector.begin();
 		str = *it;
-
 		if (!str.compare("T:"))
 		{
-			token_vector.erase(token_vector.begin());
-			for (const auto &e : token_vector)
-				ofile << e << " ";
-			break;
+			it++;
+
+			//PARTE DO CÓDIGO 
+			while (it != token_vector.end())
+			{
+				str = *it;
+				//PROCURA ENDEREÇO NA TABELA DE USO
+				for (vector<tabela_uso>::iterator its = uso_vector1.begin(); its != uso_vector1.end(); its++)
+				{
+					if ((*its).endereco == pc)
+					{	//É UMA VARIÁVEL DA TABELA DE USO
+						is_uso =1;
+						variavel = (*its).simbolo;
+						for (vector<tabela_definicoes>::iterator itd = definicoes_vector2.begin(); itd != definicoes_vector2.end(); itd++)
+						{
+							if (!variavel.compare((*itd).simbolo))
+							{
+								//então eu achei qual a posiçao da tabela que tem o endereço que eu quero 
+								//(*itd).valor esse é o valor que deve ir pro arquivo de saída
+								ofile << (*itd).valor << " ";
+							}
+						}
+					}
+				}
+				if (! is_uso)
+				{
+					ofile << *it << " ";	
+				}
+				is_uso = 0;
+				it++;
+				pc++;
+			}
 		}
 	}
+	infile3.close();
 
-
-
-	//todo ATÉ AQUI JÁ FEZ A LIGAÇÃO PARA O ARQUIVO 1
-	// na verdade ta faltando corrigir a tabela de uso
-	file_in = file_2 + ".txt"; //todo corrigir formato	
-	std::ifstream infile2(file_in);
-	std::getline(infile2, line);
-	std::getline(infile2, line);
-	std::getline(infile2, line);
-	vector<string> token_vector = separate_tokens(line);
-	vector<string>::iterator it_ = token_vector.begin();
-	it_++;
-
-	//copia pro vetor de relocacao as infos do arquivo
-	
-	while (it_ != token_vector.end())
+	//************************
+	//COMEÇA A LIGAR ARQUIVO 2
+	//************************
+	std::ifstream infile4(file_in2);
+	while (std::getline(infile4, line))
 	{
-		mapa_relocacao_vector.push_back(stoi(*it) + fator_relocacao); //pega o numero de relocacao + fator de relocacao
-		it++;
+
 	}
 
-*/
 
 }
 

@@ -13,10 +13,24 @@
 
 using namespace std;
 
+#define TABELA 1
+
+typedef struct tabela_uso
+{
+	string simbolo;
+	int endereco;
+} tabela_uso;
+
+typedef struct tabela_definicoes
+{
+	string simbolo;
+	int valor;
+} tabela_definicoes;
+
 
 bool file_exist(std::string fileName)
 {
-	//fileName = fileName + ".txt" ; //corrigir e trocar pra .o
+	fileName = fileName + ".txt" ; //corrigir e trocar pra .o
 	std::ifstream infile(fileName);
 	return infile.good();
 }
@@ -41,14 +55,13 @@ vector<string> separate_tokens(string line)
 
 void ligador1(string file_in)
 {
+	string file_out = file_in + "out.txt"; //TODO criar nome de saída corretamente
+	ofstream ofile(file_out);
+
+	file_in = file_in + ".txt";	//todo corrigir formato
 	std::ifstream infile(file_in);
 	std::string line;
 	string str;
-
-	string file_out = "teste.txt"; //todo criar nome de saída 
-	ofstream ofile(file_out);
-
-	vector<string> aux;
 
 	//While lê arquivo de entrada até o arquivo acabar
 	while (std::getline(infile, line))
@@ -60,8 +73,6 @@ void ligador1(string file_in)
 
 		if (!str.compare("T:"))
 		{
-			//começa realmente a ligação
-			//TODO conferir se a lgação pra um arquivo é só copiar o texto mesmo
 			token_vector.erase(token_vector.begin());
 			for (const auto &e : token_vector)
 				ofile << e << " ";
@@ -72,7 +83,222 @@ void ligador1(string file_in)
 
 void ligador2(string file_1, string file_2)
 {
-	cout << "ligador2" <<endl;
+	vector<string> token_vector;
+	vector<string>::iterator it;
+	string line;
+	string str;
+
+
+	//***********************************
+	//COPIA CABEÇALHO DO PRIMEIRO ARQUIVO
+	//***********************************
+	string file_in = file_1 + ".txt"; //todo corrigir formato	
+
+	std::ifstream infile(file_in);
+	std::getline(infile, line);
+	std::getline(infile, line);
+
+	//GERA FATOR DE RELOCAÇÃO
+	token_vector = separate_tokens(line);
+	it = token_vector.begin();
+	it++;
+	int fator_relocacao = stoi(*it) + 1; //fator de relocacao = arquivo + 1 ???
+
+
+	//GERA MAPA DE RELOCAÇÃO 
+	vector<int> mapa_relocacao_vector1;
+	std::getline(infile, line);
+	token_vector = separate_tokens(line);
+	it = token_vector.begin();
+	it ++;
+	while (it != token_vector.end())
+	{
+		mapa_relocacao_vector1.push_back(stoi(*it));
+		it++;
+	}
+
+	//COPIA TABELA DE USO
+	vector<tabela_uso> uso_vector1;
+	std::getline(infile, line);
+	token_vector = separate_tokens(line);
+	it = token_vector.begin();
+	it++;
+	while (it != token_vector.end())
+	{
+		tabela_uso temp2;
+		temp2.simbolo = (*it);
+		it++;
+		temp2.endereco = stoi(*it);
+		uso_vector1.push_back(temp2);
+		it++;
+	}
+
+	//COPIA TABELA DE DEFINIÇÕES
+	vector<tabela_definicoes> definicoes_vector1;
+	std::getline(infile, line);
+	token_vector = separate_tokens(line);
+	it = token_vector.begin();
+	it++;
+	while (it != token_vector.end())
+	{
+		tabela_definicoes temp2;
+		temp2.simbolo = (*it);
+		it++;
+		temp2.valor = stoi(*it);
+		definicoes_vector1.push_back(temp2);
+		it++;
+	}
+
+	infile.close();
+
+	if(TABELA)
+	{
+		cout << "********************" << endl;
+		cout << "TABELAS DO ARQUIVO 1" << endl;
+		cout << "FATOR DE RELOCAÇÃO: " << fator_relocacao << endl;
+		cout << "MAPA DE RELOCAÇÃO: ";
+		for (vector<int>::iterator i = mapa_relocacao_vector1.begin(); i != mapa_relocacao_vector1.end(); i++)
+		{
+			cout << (*i) << " ";
+		}
+		cout << endl << "TABELA DE USO: ";
+		for (vector<tabela_uso>::iterator i = uso_vector1.begin(); i != uso_vector1.end(); i++)
+		{
+			cout << "\n" << (*i).simbolo << " " << (*i).endereco;
+		}
+		cout << endl << "TABELA DE DEFINICOES: ";
+		for (vector<tabela_definicoes>::iterator i = definicoes_vector1.begin(); i != definicoes_vector1.end(); i++)
+		{
+			cout << "\n" << (*i).simbolo << " " << (*i).valor;
+		}
+		cout << endl << endl;
+	}
+
+	//***********************************
+	//COPIA CABEÇALHO DO SEGUNDO ARQUIVO
+	//***********************************
+	file_in = file_2 + ".txt"; //todo corrigir formato	
+
+	std::ifstream infile2(file_in);
+	std::getline(infile2, line);
+	std::getline(infile2, line);
+
+	//GERA MAPA DE RELOCAÇÃO 
+	vector<int> mapa_relocacao_vector2;
+	std::getline(infile2, line);
+	token_vector = separate_tokens(line);
+	it = token_vector.begin();
+	it ++;
+	while (it != token_vector.end())
+	{
+		mapa_relocacao_vector2.push_back(stoi(*it));
+		it++;
+	}
+
+	//COPIA TABELA DE USO
+	vector<tabela_uso> uso_vector2;
+	std::getline(infile2, line);
+	token_vector = separate_tokens(line);
+	it = token_vector.begin();
+	it++;
+	while (it != token_vector.end())
+	{
+		tabela_uso temp2;
+		temp2.simbolo = (*it);
+		it++;
+		temp2.endereco = stoi(*it);
+		uso_vector2.push_back(temp2);
+		it++;
+	}
+
+	//COPIA TABELA DE DEFINIÇÕES
+	vector<tabela_definicoes> definicoes_vector2;
+	std::getline(infile2, line);
+	token_vector = separate_tokens(line);
+	it = token_vector.begin();
+	it++;
+	while (it != token_vector.end())
+	{
+		tabela_definicoes temp2;
+		temp2.simbolo = (*it);
+		it++;
+		temp2.valor = stoi(*it);
+		definicoes_vector2.push_back(temp2);
+		it++;
+	}
+
+	infile2.close();
+
+	if(TABELA)
+	{
+		cout << "\n\n\n********************" << endl;
+		cout << "TABELAS DO ARQUIVO 2" << endl;
+		cout << "MAPA DE RELOCAÇÃO: ";
+		for (vector<int>::iterator i = mapa_relocacao_vector2.begin(); i != mapa_relocacao_vector2.end(); i++)
+		{
+			cout << (*i) << " ";
+		}
+		cout << endl << "TABELA DE USO: ";
+		for (vector<tabela_uso>::iterator i = uso_vector2.begin(); i != uso_vector2.end(); i++)
+		{
+			cout << "\n" << (*i).simbolo << " " << (*i).endereco;
+		}
+		cout << endl << "TABELA DE DEFINICOES: ";
+		for (vector<tabela_definicoes>::iterator i = definicoes_vector2.begin(); i != definicoes_vector2.end(); i++)
+		{
+			cout << "\n" << (*i).simbolo << " " << (*i).valor;
+		}
+		cout << endl << endl;
+	}
+
+
+/*
+
+	//CORRETO ATÉ AQUI 
+	string file_out = "ligado.txt"; //TODO criar nome de saída corretamente
+	ofstream ofile(file_out);
+
+
+	//While lê arquivo de entrada até o arquivo acabar
+	while (std::getline(infile, line))
+	{
+		vector<string> token_vector = separate_tokens(line);
+
+		vector<string>::iterator it = token_vector.begin();
+		str = *it;
+
+		if (!str.compare("T:"))
+		{
+			token_vector.erase(token_vector.begin());
+			for (const auto &e : token_vector)
+				ofile << e << " ";
+			break;
+		}
+	}
+
+
+
+	//todo ATÉ AQUI JÁ FEZ A LIGAÇÃO PARA O ARQUIVO 1
+	// na verdade ta faltando corrigir a tabela de uso
+	file_in = file_2 + ".txt"; //todo corrigir formato	
+	std::ifstream infile2(file_in);
+	std::getline(infile2, line);
+	std::getline(infile2, line);
+	std::getline(infile2, line);
+	vector<string> token_vector = separate_tokens(line);
+	vector<string>::iterator it_ = token_vector.begin();
+	it_++;
+
+	//copia pro vetor de relocacao as infos do arquivo
+	
+	while (it_ != token_vector.end())
+	{
+		mapa_relocacao_vector.push_back(stoi(*it) + fator_relocacao); //pega o numero de relocacao + fator de relocacao
+		it++;
+	}
+
+*/
+
 }
 
 int main(int argc, char *argv[])
@@ -105,12 +331,12 @@ int main(int argc, char *argv[])
 
 		if (!file_exist(file_1))
 		{
-			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+			cout << "\nERRO.\nArquivo "<< file_1 <<".o não existe nessa pasta!\n\n";
 			return 0;
 		}
 		if (!file_exist(file_2))
 		{
-			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+			cout << "\nERRO.\nArquivo "<<file_2 <<".o não existe nessa pasta!\n\n";
 			return 0;
 		}
 

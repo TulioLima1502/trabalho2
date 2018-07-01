@@ -1745,7 +1745,6 @@ void primeira_passagem(string file_in, int n_files)
 
 	vector<string>::iterator it;
 
-	//TODO descomentar isso para criar a tabela de uso
 	passagem_extern(file_in);
 
 	cout << "Começando a fazer a primeira passagem no arquivo: ";
@@ -1825,26 +1824,6 @@ void primeira_passagem(string file_in, int n_files)
 				it++;
 				str = *it;
 			}
-
-			
-			/*if (!str.compare("EXTERN"))
-			{
-				it--;
-				str = *it;
-				str.erase(std::prev(str.end()));
-				for (vector<tabela_simbolo>::iterator it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
-				{
-					if (!str.compare((*it_s).simbolo))
-					{
-						(*it_s).is_extern = 1;
-						(*it_s).valor = -1; //TODO corrigir ese valor?
-						break;
-					}
-				}
-				it++;
-				str = *it;
-			}*/
-
 		}
 
 		//VERIFICA SE É INSTRUÇÃO
@@ -1954,7 +1933,6 @@ void primeira_passagem(string file_in, int n_files)
 								{
 									//GUIA ATUALIZA TABELA DE DEFINIÇAO
 									//CASO DO SIMBOLO DECLARADO COMO PUBLIC
-									//TODO implementar public
 									pc=pc;
 									++it;
 									str = *it;
@@ -2073,7 +2051,7 @@ void segunda_passagem(string file_in, string file_out)
 	//While lê arquivo de entrada até o arquivo acabar
 	//colocar o vetor aux no arquivo final
 
-	//TODO ESCREVER CABEÇALHO AQUI
+	//ESCREVE O CABEÇALHO
 	//Nome programa
 	//TODO corrigir nome do programa
 	ofile << "H: "<< file_in << "\n" ;
@@ -2112,7 +2090,7 @@ void segunda_passagem(string file_in, string file_out)
 	aux.clear();
 
 
-	//Início do texto
+	//ESCREVE O TEXTO
 	ofile << "T: ";
 	while (std::getline(infile, line))
 	{
@@ -2189,7 +2167,7 @@ void segunda_passagem(string file_in, string file_out)
 								if ((n_linha <= data) || (data == -1))
 									aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
 								else
-									printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+									printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); 
 							}
 						}
 					}
@@ -2211,7 +2189,7 @@ void segunda_passagem(string file_in, string file_out)
 									if ((n_linha <= data) || (data == -1))
 										aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
 									else
-										printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+										printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); 
 								}
 							}
 							else
@@ -2238,7 +2216,7 @@ void segunda_passagem(string file_in, string file_out)
 							if ((n_linha <= data) || (data == -1))
 								aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
 							else
-								printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); //todo corrigir tipo de erro
+								printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); 
 						}
 					}
 				}

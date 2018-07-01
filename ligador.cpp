@@ -13,7 +13,8 @@
 
 using namespace std;
 
-#define TABELA 1
+#define TABELA 0
+#define MENSAGENS 1
 
 typedef struct tabela_uso
 {
@@ -174,6 +175,11 @@ void ligador2(string file_1, string file_2)
 		cout << endl << endl;
 	}
 
+	if(MENSAGENS)
+	{
+		cout << "Copiou cabeçalho do primeiro arquivo"<< endl;
+	}
+
 	//***********************************
 	//COPIA CABEÇALHO DO SEGUNDO ARQUIVO
 	//***********************************
@@ -251,6 +257,10 @@ void ligador2(string file_1, string file_2)
 		cout << endl << endl;
 	}
 
+	if(MENSAGENS)
+	{
+		cout << "Copiou cabeçalho do segundo arquivo"<< endl;
+	}
 
 	int pc = 0;
 	string variavel;
@@ -264,7 +274,6 @@ void ligador2(string file_1, string file_2)
 	std::ifstream infile3(file_in);
 	while (std::getline(infile3, line))
 	{
-		cout << "entrou no while" << endl;
 		token_vector = separate_tokens(line);
 		it = token_vector.begin();
 		str = *it;
@@ -306,15 +315,71 @@ void ligador2(string file_1, string file_2)
 	}
 	infile3.close();
 
+	if(MENSAGENS)
+	{
+		cout << "Ligou o primeiro arquivo"<< endl;
+	}
+
 	//************************
 	//COMEÇA A LIGAR ARQUIVO 2
 	//************************
 	std::ifstream infile4(file_in2);
 	while (std::getline(infile4, line))
 	{
+		token_vector = separate_tokens(line);
+		it = token_vector.begin();
+		str = *it;
+		if (!str.compare("T:"))
+		{
+			it++;
 
+			//PARTE DO CÓDIGO 
+			vector<int>::iterator it_mp = mapa_relocacao_vector2.begin();
+			while (it != token_vector.end())
+			{
+				if (pc == *(it_mp)) //significa que o pc == alguma instrução
+				{
+					ofile << *it << " ";
+					it_mp++;
+					//so copia o que tem no arquivo pro outro arquivo
+				}
+				else
+				{ //significa que tem que ser realocado.
+					for (vector<tabela_uso>::iterator its = uso_vector2.begin(); its != uso_vector2.end(); its++)
+					{
+						if ((*its).endereco == pc)
+						{	//É UMA VARIÁVEL DA TABELA DE USO
+							is_uso =1;
+							variavel = (*its).simbolo;
+							for (vector<tabela_definicoes>::iterator itd = definicoes_vector1.begin(); itd != definicoes_vector1.end(); itd++)
+							{
+								if (!variavel.compare((*itd).simbolo))
+								{
+									//então eu achei qual a posiçao da tabela que tem o endereço que eu quero 
+									//(*itd).valor esse é o valor que deve ir pro arquivo de saída
+									ofile << (*itd).valor << " ";
+									break;
+								}
+							}
+						}
+					}	
+					if (! is_uso)
+					{
+						ofile << stoi(*it)+fator_relocacao << " ";	
+					}
+					is_uso=0;
+				}
+				pc++;
+				it++;
+			}
+		}
 	}
+	infile4.close();
 
+	if(MENSAGENS)
+	{
+		cout << "Ligou o segundo arquivo"<< endl;
+	}
 
 }
 

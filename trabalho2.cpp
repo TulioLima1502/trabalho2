@@ -77,6 +77,7 @@ typedef struct tabela_uso
 	int endereco;
 } tabela_uso;
 
+
 //DEFINIÇÃO DAS TABELAS
 vector<tabela_simbolo> tabela_simbolo_vector;
 
@@ -91,6 +92,8 @@ vector<tabela_uso> tabela_uso_vector;
 //VARIÁVEL GLOBAL AUXILIAR
 int data = -1;
 int data_pc = -1;
+int tamanho_programa;
+vector<int> info_relocacao;
 
 
 //INICIALIZAÇÃO DAS TABELAS
@@ -1382,7 +1385,7 @@ void pre_procesamento(char *file_name, int lineachousection)
 	int fim, posequ, fimequ, remover, teste, erroequ = 0, marcador = 0;
 	ifstream meufile("auxiliar");
 	ofstream equfile("EQU", ios::app);
-	ofstream saidafile(nome.append(".pre"), ios::app);
+	ofstream saidafile(nome.append(".mcr"), ios::app);
 
 	if (meufile.is_open())
 	{
@@ -1669,9 +1672,18 @@ void passagem_extern(string file_in)
 			{
 				it--;
 				str = *it;
-				str.erase(std::prev(str.end())); //apaga o ':'
-				cria_tabela_uso(str);
+				if (!str.empty())
+				{
+					//nome = nome.substr(0, nome.size());
+					//string substr (size_t pos = 0, size_t len = npos) const;
+					size_t pos_end = str.find(":");
+					string str2 = str.substr(0,pos_end);
 
+					//str.erase(std::prev(str.end())); //apaga o ':'
+
+					//str.erase(str.end()-1); 
+					cria_tabela_uso(str2);
+				}
 				break;
 			}
 		}
@@ -1715,9 +1727,6 @@ void procura_uso(string str, int pc)
 
 void primeira_passagem(string file_in, int n_files)
 {
-	cout << "Começando a fazer a primeira passagem no arquivo: ";
-	cout << file_in << endl;
-
 	//*******PRIMEIRA PASSAGEM*******
 	std::ifstream infile(file_in);
 	std::string line;
@@ -1739,12 +1748,14 @@ void primeira_passagem(string file_in, int n_files)
 	//TODO descomentar isso para criar a tabela de uso
 	passagem_extern(file_in);
 
+	cout << "Começando a fazer a primeira passagem no arquivo: ";
+	cout << file_in << endl;
+
 	//Cria arquivo intermediario
 	//ofstream ofile("file_inter.txt");
 	//While lê arquivo de entrada até o arquivo acabar
 	while (std::getline(infile, line))
 	{
-
 		//ANÁLISE LÉXICA
 		//separa os tokens e faz análise léxica
 		vector<string> token_vector = separate_tokens(line);
@@ -1759,14 +1770,18 @@ void primeira_passagem(string file_in, int n_files)
 			str.erase(std::prev(str.end())); //apaga o ':'
 			if (token_vector.size())
 			{
-
 				//percorre toda a tabela de simbolos  comparando o token do arquivo com o simbolo definido na tabela
-				for (vector<tabela_simbolo>::iterator it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
-					if (!str.compare((*it_s).simbolo)) //ja está definido na tabela
+				if (tabela_simbolo_vector.size())
+				{
+					for (vector<tabela_simbolo>::iterator it_s = tabela_simbolo_vector.begin(); it_s != tabela_simbolo_vector.end(); ++it_s)
 					{
-						printf("Erro Semântico! \n Símbolo redefinido. \n Linha: %d \n", n_linha);
-						simbolo_redefinido = 1;
+						if (!str.compare((*it_s).simbolo)) //ja está definido na tabela
+						{
+							printf("Erro Semântico! \n Símbolo redefinido. \n Linha: %d \n", n_linha);
+							simbolo_redefinido = 1;
+						}
 					}
+				}
 				if (!simbolo_redefinido)
 				{
 					//pc++; //TODO PENSAR SE O PC TA CORRETO corrigir 
@@ -1781,6 +1796,7 @@ void primeira_passagem(string file_in, int n_files)
 			if (token_vector.size() > 1) //evitar seg fault
 				++it;					 //pega o proximo token da linha do arquivo
 			str = *it;
+
 
 			if (!str.compare("CONST"))
 			{
@@ -1811,7 +1827,7 @@ void primeira_passagem(string file_in, int n_files)
 			}
 
 			
-		/*	if (!str.compare("EXTERN"))
+			/*if (!str.compare("EXTERN"))
 			{
 				it--;
 				str = *it;
@@ -1830,12 +1846,14 @@ void primeira_passagem(string file_in, int n_files)
 			}*/
 
 		}
+
 		//VERIFICA SE É INSTRUÇÃO
 		for (vector<tabela_instrucao>::iterator it_i = tabela_instrucao_vector.begin(); it_i != tabela_instrucao_vector.end(); ++it_i)
 		{
 			if (!str.compare((*it_i).mnemonico))
 			{ //se for uma instruçao ele atualiza o valor do PC e diz que ja encontrou, pra nao precisar procurar nas diretivas
-				pc_aux = pc + 1; //endereço da instrução
+				info_relocacao.push_back(pc);
+				pc_aux = pc; //endereço da instrução
 				pc = pc + (*it_i).n_operando + 1;
 				
 				//GUIA CORRIGIR TABELA DE USO
@@ -1859,10 +1877,12 @@ void primeira_passagem(string file_in, int n_files)
 					}
 				}
 				//else seria um stop
-
 				found = 1;
 			}
+
 		}
+	
+
 		//VERIFICA SE É DIRETIVA
 		if (!found)
 		{
@@ -1944,10 +1964,10 @@ void primeira_passagem(string file_in, int n_files)
 								{
 									if (!str.compare("EXTERN"))
 									{
-
 										pc=pc;
-										++it;
-										str = *it;
+										//++it;
+										//str = *it;
+										//cout << "string atualizada: " << str << endl;
 										//chamar outra função
 									}	
 									else
@@ -1962,6 +1982,7 @@ void primeira_passagem(string file_in, int n_files)
 				}
 			}
 		}
+
 		++n_linha;
 	}
 	if  (n_files == 2)
@@ -1971,6 +1992,8 @@ void primeira_passagem(string file_in, int n_files)
 		if (!found_end)
 			cout << "Erro! \n Diretiva END não encontrada. \n";
 	}
+
+	tamanho_programa = pc -1; //TODO VERIFICAR SE ESTÁ CORRETO
 }
 
 
@@ -2048,6 +2071,24 @@ void segunda_passagem(string file_in, string file_out)
 	//Cria arquivo intermediario
 	ofstream ofile(file_out);
 	//While lê arquivo de entrada até o arquivo acabar
+	//colocar o vetor aux no arquivo final
+
+	//TODO ESCREVER CABEÇALHO AQUI
+	//Nome programa
+	//TODO corrigir nome do programa
+	ofile << "H: "<< file_in << "\n" ;
+
+	//Tamanho do programa
+	ofile << "H: "<< to_string(tamanho_programa) << "\n" ;
+
+	//Info de relocação
+	ofile << "H: ";
+	for (const auto &e : info_relocacao)
+		ofile << e << " ";
+	ofile << "\n";
+
+	//Início do texto
+	ofile << "T: ";
 	while (std::getline(infile, line))
 	{
 
@@ -2274,8 +2315,7 @@ void montagem(string filein, string fileout, int n_files)
 	segunda_passagem(filein, fileout);
 }
 
-
-int main(int argc, char *argv[])
+/*int main(int argc, char *argv[])
 {
 	//argc eh um inteiro com o numero de argumentos passados pela linha de comando
 	//argv eh um vetor com os argumentos. argv[0] sempre sera o path do programa,
@@ -2401,4 +2441,100 @@ int main(int argc, char *argv[])
 	}
 
 	return 0;
+}*/
+
+
+int main(int argc, char *argv[])
+{
+	//argc eh um inteiro com o numero de argumentos passados pela linha de comando
+	//argv eh um vetor com os argumentos. argv[0] sempre sera o path do programa,
+	//entao eh basicamente ignorado. por isso, o argc na verdade vai ser o numero
+	//de argumentos mais um.
+
+	string file_name;
+	string file_in;
+	int lineachousection;
+
+	int n_files = 0;
+
+
+
+	if (argc == 2)
+	{
+		cout << "Faz a saída do ligador para 1 arquivo" << endl;
+		int n_files = 1;
+		//Descobrir como fazer 1 arquivo do ligador
+		//Chama o programa de montagem que temos hoje sem o begin e end, se tiver mostra um erro
+		//Verifica se existe extern e public(retorna erro?? Perguntar para o professor)
+		//Se possível já vai salvando a tabela de definição e uso de símbolos para o primeiro arquivo
+		//monta os diversos arquivos em um único arquivo de saída
+
+		file_name = argv[1]; // passar para learquivo(). eh o nome do arquivo .asm.
+		file_in = file_name + ".mcr";
+		cout << file_in << endl;
+		if (!file_exist(file_in))
+		{
+			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+			return 0;
+		}
+
+		//lerarquivo(argv[2],argv[3]);
+		//lineachousection = lerarquivo(file_in, argv[1]);
+		//pre_procesamento(argv[1], lineachousection);
+		//expande_macro(argv[1]);
+		//FUNÇOES DA MONTAGEM
+		string file_out = file_name + ".txt"; 
+		montagem(file_in, file_out, n_files);
+		//Realiza a montagem do código depois de expandir as macros
+
+		//testes todo retirar bloco abaixo
+		cout << "\n\nTABELA DE USO\n";
+		vector<tabela_uso>::iterator it_s;
+		for (it_s = tabela_uso_vector.begin(); it_s != tabela_uso_vector.end(); ++it_s)
+		{		
+			cout << "Simbolo: " <<(*it_s).simbolo <<"\tEndereço: "<< (*it_s).endereco<<endl;
+
+		}
+
+		cout << "\n\nTABELA DE DEFINIÇÕES\n";
+		vector<tabela_definicoes>::iterator it_;
+		for (it_ = tabela_definicoes_vector.begin(); it_ != tabela_definicoes_vector.end(); ++it_)
+		{		
+			cout << "Simbolo: " <<(*it_).simbolo <<"\tEndereço: "<< (*it_).valor<<endl;
+		}
+
+		cout << "\n\nTABELA DE SIMBOLOS\n";
+		vector<tabela_simbolo>::iterator it;
+		for (it = tabela_simbolo_vector.begin(); it != tabela_simbolo_vector.end(); ++it)
+		{		
+			cout << "Simbolo: " <<(*it).simbolo <<"\tEndereço: "<< (*it).valor<<endl;
+		}
+
+		cout << "\n\nINFO RELOCAÇÃO\n";
+		vector<int>::iterator i;
+		for (i = info_relocacao.begin(); i != info_relocacao.end(); ++i)
+		{		
+			cout << *i << endl;
+		}
+
+
+	}
+	else if (argc == 3)
+	{
+
+		cout << "Faz a saída do ligador para 2 arquivos" << endl;
+		int n_files = 2;
+		//Descobrir como fazer para 2 arquivos depois de ter feito para 1 arquivo
+		file_name = argv[2]; // passar para learquivo(). eh o nome do arquivo .asm.
+		file_in = file_name + ".asm";
+
+		cout << argv[1] << endl;
+		cout << file_name << endl;
+		cout << file_in << endl;
+	}
+	
+
+	return 0;
 }
+
+

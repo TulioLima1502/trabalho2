@@ -2087,6 +2087,31 @@ void segunda_passagem(string file_in, string file_out)
 		ofile << e << " ";
 	ofile << "\n";
 
+	//Tabela de uso
+	ofile << "U: ";
+	for (vector<tabela_uso>::iterator it = tabela_uso_vector.begin(); it != tabela_uso_vector.end(); ++it)
+	{
+		aux.push_back((*it).simbolo);
+		aux.push_back(to_string((*it).endereco));
+	}
+	for (const auto &e : aux)
+		ofile << e << " ";
+	ofile << "\n";
+	aux.clear();
+
+	//Tabela de definições
+	ofile << "D: ";
+	for (vector<tabela_definicoes>::iterator it = tabela_definicoes_vector.begin(); it != tabela_definicoes_vector.end(); ++it)
+	{
+		aux.push_back((*it).simbolo);
+		aux.push_back(to_string((*it).valor));
+	}
+	for (const auto &e : aux)
+		ofile << e << " ";
+	ofile << "\n";
+	aux.clear();
+
+
 	//Início do texto
 	ofile << "T: ";
 	while (std::getline(infile, line))

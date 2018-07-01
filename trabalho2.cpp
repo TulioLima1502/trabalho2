@@ -26,6 +26,8 @@
 //
 // ** PARA CORRETO FUNCIONAMENTO É NECESSAŔIO TER UM ARQUIVO TEXTO COM EXTENSÃO .ASM NA MESMA PASTA DO PROGRAMA TRABALHO1.CPP
 
+#define DEBUG 0
+
 #include <iostream>
 #include <istream>
 #include <fstream>
@@ -192,7 +194,7 @@ void inicia_tabela_diretiva()
 
 bool file_exist(std::string fileName)
 {
-	//fileName = fileName + ".asm" ;
+	fileName = fileName + ".asm" ;
 	std::ifstream infile(fileName);
 	return infile.good();
 }
@@ -1861,7 +1863,6 @@ void primeira_passagem(string file_in, int n_files)
 
 		}
 	
-
 		//VERIFICA SE É DIRETIVA
 		if (!found)
 		{
@@ -2144,6 +2145,7 @@ void segunda_passagem(string file_in, string file_out)
 				{
 					aux.push_back((*it_i).opcode);
 					printf("Erro! \n Número de operandos da instrução errado. \n Linha: %d \n", n_linha);
+					cout << "inst: " << (*it_i).mnemonico<< endl;
 					if (distance(it, it_end) > ((*it_i).n_operando + 1))
 					{
 						//tem mais operandos do que precisa
@@ -2318,7 +2320,8 @@ void montagem(string filein, string fileout, int n_files)
 	segunda_passagem(filein, fileout);
 }
 
-/*int main(int argc, char *argv[])
+/*
+int main(int argc, char *argv[])
 {
 	//argc eh um inteiro com o numero de argumentos passados pela linha de comando
 	//argv eh um vetor com os argumentos. argv[0] sempre sera o path do programa,
@@ -2402,11 +2405,6 @@ void montagem(string filein, string fileout, int n_files)
 		{
 			cout << "Faz a saída do ligador para 1 arquivo" << endl;
 			int n_files = 1;
-			//Descobrir como fazer 1 arquivo do ligador
-			//Chama o programa de montagem que temos hoje sem o begin e end, se tiver mostra um erro
-			//Verifica se existe extern e public(retorna erro?? Perguntar para o professor)
-			//Se possível já vai salvando a tabela de definição e uso de símbolos para o primeiro arquivo
-			//monta os diversos arquivos em um único arquivo de saída
 
 			file_name = argv[1]; // passar para learquivo(). eh o nome do arquivo .asm.
 			file_in = file_name + ".asm";
@@ -2424,9 +2422,44 @@ void montagem(string filein, string fileout, int n_files)
 			//FUNÇOES DA MONTAGEM
 			string file_ = argv[1];
 			file_in = file_ + ".mcr";
-			string file_out = file_ + ".o"; //todo trocar pra '.o'
+			string file_out = file_ + ".txt"; //todo trocar pra '.o'
 			montagem(file_in, file_out, n_files);
 			//Realiza a montagem do código depois de expandir as macros
+
+
+			//IMPRIME TABELAS PARA DEBUG
+			if (DEBUG)
+			{
+				cout << "\n\nTABELA DE USO\n";
+				vector<tabela_uso>::iterator it_s;
+				for (it_s = tabela_uso_vector.begin(); it_s != tabela_uso_vector.end(); ++it_s)
+				{		
+					cout << "Simbolo: " <<(*it_s).simbolo <<"\tEndereço: "<< (*it_s).endereco<<endl;
+
+				}
+
+				cout << "\n\nTABELA DE DEFINIÇÕES\n";
+				vector<tabela_definicoes>::iterator it_;
+				for (it_ = tabela_definicoes_vector.begin(); it_ != tabela_definicoes_vector.end(); ++it_)
+				{		
+					cout << "Simbolo: " <<(*it_).simbolo <<"\tEndereço: "<< (*it_).valor<<endl;
+				}
+
+				cout << "\n\nTABELA DE SIMBOLOS\n";
+				vector<tabela_simbolo>::iterator it;
+				for (it = tabela_simbolo_vector.begin(); it != tabela_simbolo_vector.end(); ++it)
+				{		
+					cout << "Simbolo: " <<(*it).simbolo <<"\tEndereço: "<< (*it).valor<<endl;
+				}
+
+				cout << "\n\nINFO RELOCAÇÃO\n";
+				vector<int>::iterator i;
+				for (i = info_relocacao.begin(); i != info_relocacao.end(); ++i)
+				{		
+					cout << *i << endl;
+				}
+			}
+
 		}
 		else if (argc == 3)
 		{
@@ -2449,32 +2482,26 @@ void montagem(string filein, string fileout, int n_files)
 
 int main(int argc, char *argv[])
 {
-	//argc eh um inteiro com o numero de argumentos passados pela linha de comando
-	//argv eh um vetor com os argumentos. argv[0] sempre sera o path do programa,
-	//entao eh basicamente ignorado. por isso, o argc na verdade vai ser o numero
-	//de argumentos mais um.
+	if ((argc > 3) || (argc < 2))
+	{
+		cout << "\nERRO.\nNúmero de argumentos inválidos! " << endl;
+		return 0;
+	}
 
 	string file_name;
 	string file_in;
 	int lineachousection;
-
 	int n_files = 0;
-
-
 
 	if (argc == 2)
 	{
 		cout << "Faz a saída do ligador para 1 arquivo" << endl;
-		int n_files = 1;
-		//Descobrir como fazer 1 arquivo do ligador
-		//Chama o programa de montagem que temos hoje sem o begin e end, se tiver mostra um erro
-		//Verifica se existe extern e public(retorna erro?? Perguntar para o professor)
-		//Se possível já vai salvando a tabela de definição e uso de símbolos para o primeiro arquivo
-		//monta os diversos arquivos em um único arquivo de saída
+
+		n_files = 1;
 
 		file_name = argv[1]; // passar para learquivo(). eh o nome do arquivo .asm.
-		file_in = file_name + ".mcr";
-		cout << file_in << endl;
+		file_in = file_name;
+		//cout << "file_in: " << file_in << endl;
 		if (!file_exist(file_in))
 		{
 			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
@@ -2482,61 +2509,164 @@ int main(int argc, char *argv[])
 		}
 
 		//lerarquivo(argv[2],argv[3]);
-		//lineachousection = lerarquivo(file_in, argv[1]);
-		//pre_procesamento(argv[1], lineachousection);
+		lineachousection = lerarquivo(file_name, argv[1]);
+		pre_procesamento(argv[1], lineachousection);
 		//expande_macro(argv[1]);
 		//FUNÇOES DA MONTAGEM
-		string file_out = file_name + ".txt"; 
+		string file_ = argv[1];
+		file_in = file_ + ".mcr"; //todo conferir -> troquei a saída do pre_procesamento pra .mcr 
+		string file_out = file_ + ".txt"; //todo trocar pra '.o'
 		montagem(file_in, file_out, n_files);
-		//Realiza a montagem do código depois de expandir as macros
 
-		//testes todo retirar bloco abaixo
-		cout << "\n\nTABELA DE USO\n";
-		vector<tabela_uso>::iterator it_s;
-		for (it_s = tabela_uso_vector.begin(); it_s != tabela_uso_vector.end(); ++it_s)
-		{		
-			cout << "Simbolo: " <<(*it_s).simbolo <<"\tEndereço: "<< (*it_s).endereco<<endl;
 
+		//IMPRIME TABELAS PARA DEBUG
+		if (DEBUG)
+		{
+			cout << "\n\nTABELA DE USO\n";
+			vector<tabela_uso>::iterator it_s;
+			for (it_s = tabela_uso_vector.begin(); it_s != tabela_uso_vector.end(); ++it_s)
+			{		
+				cout << "Simbolo: " <<(*it_s).simbolo <<"\tEndereço: "<< (*it_s).endereco<<endl;
+
+			}
+
+			cout << "\n\nTABELA DE DEFINIÇÕES\n";
+			vector<tabela_definicoes>::iterator it_;
+			for (it_ = tabela_definicoes_vector.begin(); it_ != tabela_definicoes_vector.end(); ++it_)
+			{		
+				cout << "Simbolo: " <<(*it_).simbolo <<"\tEndereço: "<< (*it_).valor<<endl;
+			}
+
+			cout << "\n\nTABELA DE SIMBOLOS\n";
+			vector<tabela_simbolo>::iterator it;
+			for (it = tabela_simbolo_vector.begin(); it != tabela_simbolo_vector.end(); ++it)
+			{		
+				cout << "Simbolo: " <<(*it).simbolo <<"\tEndereço: "<< (*it).valor<<endl;
+			}
+
+			cout << "\n\nINFO RELOCAÇÃO\n";
+			vector<int>::iterator i;
+			for (i = info_relocacao.begin(); i != info_relocacao.end(); ++i)
+			{		
+				cout << *i << endl;
+			}
 		}
-
-		cout << "\n\nTABELA DE DEFINIÇÕES\n";
-		vector<tabela_definicoes>::iterator it_;
-		for (it_ = tabela_definicoes_vector.begin(); it_ != tabela_definicoes_vector.end(); ++it_)
-		{		
-			cout << "Simbolo: " <<(*it_).simbolo <<"\tEndereço: "<< (*it_).valor<<endl;
-		}
-
-		cout << "\n\nTABELA DE SIMBOLOS\n";
-		vector<tabela_simbolo>::iterator it;
-		for (it = tabela_simbolo_vector.begin(); it != tabela_simbolo_vector.end(); ++it)
-		{		
-			cout << "Simbolo: " <<(*it).simbolo <<"\tEndereço: "<< (*it).valor<<endl;
-		}
-
-		cout << "\n\nINFO RELOCAÇÃO\n";
-		vector<int>::iterator i;
-		for (i = info_relocacao.begin(); i != info_relocacao.end(); ++i)
-		{		
-			cout << *i << endl;
-		}
-
-
 	}
-	else if (argc == 3)
+	else
 	{
 
 		cout << "Faz a saída do ligador para 2 arquivos" << endl;
-		int n_files = 2;
+		n_files = 2;
+
 		//Descobrir como fazer para 2 arquivos depois de ter feito para 1 arquivo
-		file_name = argv[2]; // passar para learquivo(). eh o nome do arquivo .asm.
-		file_in = file_name + ".asm";
-
-		cout << argv[1] << endl;
-		cout << file_name << endl;
-		cout << file_in << endl;
-	}
+		file_name = argv[1]; // passar para learquivo(). eh o nome do arquivo .asm.
+		string file_1 = file_name + ".asm";
+		string file_in1 = file_name + ".mcr"; //todo conferir -> troquei a saída do pre_procesamento pra .mcr 
+		string file_out1 = file_name + ".txt"; //todo trocar pra '.o'
 	
+		if (!file_exist(file_name))
+		{
+			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+			return 0;
+		}
 
+		file_name = argv[2];
+		string file_2 = file_name + ".asm";
+		string file_in2 = file_name + ".mcr"; //todo conferir -> troquei a saída do pre_procesamento pra .mcr 
+		string file_out2 = file_name + ".txt"; //todo trocar pra '.o'
+
+		if (!file_exist(file_name))
+		{
+			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+			return 0;
+		}
+
+		//****************************
+		//MONTAGEM DO PRIMEIRO ARQUIVO
+		lineachousection = lerarquivo(file_1, argv[1]);
+		pre_procesamento(argv[1], lineachousection);
+		montagem(file_in1, file_out1, n_files);
+
+		//IMPRIME TABELAS PARA DEBUG
+		if (DEBUG)
+		{
+			cout << "\n\nPRIMEIRO ARQUIVO" << endl;
+			cout << "\n\nTABELA DE USO" << endl;
+			vector<tabela_uso>::iterator it_s;
+			for (it_s = tabela_uso_vector.begin(); it_s != tabela_uso_vector.end(); ++it_s)
+			{		
+				cout << "Simbolo: " <<(*it_s).simbolo <<"\tEndereço: "<< (*it_s).endereco<<endl;
+
+			}
+
+			cout << "\n\nTABELA DE DEFINIÇÕES\n";
+			vector<tabela_definicoes>::iterator it_;
+			for (it_ = tabela_definicoes_vector.begin(); it_ != tabela_definicoes_vector.end(); ++it_)
+			{		
+				cout << "Simbolo: " <<(*it_).simbolo <<"\tEndereço: "<< (*it_).valor<<endl;
+			}
+
+			cout << "\n\nTABELA DE SIMBOLOS\n";
+			vector<tabela_simbolo>::iterator it;
+			for (it = tabela_simbolo_vector.begin(); it != tabela_simbolo_vector.end(); ++it)
+			{		
+				cout << "Simbolo: " <<(*it).simbolo <<"\tEndereço: "<< (*it).valor<<endl;
+			}
+
+			cout << "\n\nINFO RELOCAÇÃO\n";
+			vector<int>::iterator i;
+			for (i = info_relocacao.begin(); i != info_relocacao.end(); ++i)
+			{		
+				cout << *i << endl;
+			}
+		}
+
+		tabela_uso_vector.clear();
+		tabela_definicoes_vector.clear();
+		tabela_simbolo_vector.clear();
+		info_relocacao.clear();
+
+		cout << "\n\n\n********************" << endl;
+		//****************************
+		//MONTAGEM DO SEGUNDO ARQUIVO
+		lineachousection = lerarquivo(file_2, argv[2]);
+		pre_procesamento(argv[2], lineachousection);
+		montagem(file_in2, file_out2, n_files);
+
+		//IMPRIME TABELAS PARA DEBUG
+		if (DEBUG)
+		{
+			cout << "\n\nSEGUNDO ARQUIVO" << endl;
+			cout << "\n\nTABELA DE USO" << endl;
+			vector<tabela_uso>::iterator it_s;
+			for (it_s = tabela_uso_vector.begin(); it_s != tabela_uso_vector.end(); ++it_s)
+			{		
+				cout << "Simbolo: " <<(*it_s).simbolo <<"\tEndereço: "<< (*it_s).endereco<<endl;
+
+			}
+
+			cout << "\n\nTABELA DE DEFINIÇÕES\n";
+			vector<tabela_definicoes>::iterator it_;
+			for (it_ = tabela_definicoes_vector.begin(); it_ != tabela_definicoes_vector.end(); ++it_)
+			{		
+				cout << "Simbolo: " <<(*it_).simbolo <<"\tEndereço: "<< (*it_).valor<<endl;
+			}
+
+			cout << "\n\nTABELA DE SIMBOLOS\n";
+			vector<tabela_simbolo>::iterator it;
+			for (it = tabela_simbolo_vector.begin(); it != tabela_simbolo_vector.end(); ++it)
+			{		
+				cout << "Simbolo: " <<(*it).simbolo <<"\tEndereço: "<< (*it).valor<<endl;
+			}
+
+			cout << "\n\nINFO RELOCAÇÃO\n";
+			vector<int>::iterator i;
+			for (i = info_relocacao.begin(); i != info_relocacao.end(); ++i)
+			{		
+				cout << *i << endl;
+			}
+		}
+	}
 	return 0;
 }
 

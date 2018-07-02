@@ -92,6 +92,9 @@ input_2 resb 15
 number_2 resd 1
 result resd 1
 function resb 1
+caracter_enter resb 1
+caracter_enter_size resb 1
+
 section .text
 global _start
 
@@ -243,6 +246,12 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push eax
         call print_int
 
+        mov eax,3
+        mov ebx,0
+        mov ecx,caracter_enter
+        mov edx,caracter_enter_size
+        int 80h
+
         jmp pulo
 
 ;
@@ -317,6 +326,12 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push eax
         call print_int
 
+        mov eax,3
+        mov ebx,0
+        mov ecx,caracter_enter
+        mov edx,caracter_enter_size
+        int 80h
+
         jmp pulo
 
 
@@ -390,6 +405,12 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         
         push eax
         call print_int
+
+        mov eax,3
+        mov ebx,0
+        mov ecx,caracter_enter
+        mov edx,caracter_enter_size
+        int 80h
 
         jmp pulo
 
@@ -466,6 +487,12 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push eax
         call print_int
 
+        mov eax,3
+        mov ebx,0
+        mov ecx,caracter_enter
+        mov edx,caracter_enter_size
+        int 80h
+
         jmp pulo
 
 ;
@@ -539,6 +566,11 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call print_int
 
+        mov eax,3
+        mov ebx,0
+        mov ecx,caracter_enter
+        mov edx,caracter_enter_size
+        int 80h
 
         jmp pulo
 
@@ -645,11 +677,11 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         sub eax,ebx
         sub eax,1
 
-        mov edx,eax
-        mov eax,4
-        mov ebx,1
-        mov ecx,[ebp + 12]
-        int 80h
+        ;mov edx,eax
+        ;mov eax,4
+        ;mov ebx,1
+        ;mov ecx,[ebp + 12]
+        ;int 80h
 
         pop edx
         pop ecx
@@ -806,9 +838,7 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         cmp eax,32
         jne loop_print
 
-
         ; fazer um laço que conta 32 vezes e faz o print de alguma coisa
-        ; 
 
         pop edx
         pop ecx

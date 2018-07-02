@@ -2056,7 +2056,6 @@ void segunda_passagem(string file_in, string file_out)
 	//Nome programa
 	//TODO corrigir nome do programa
 	ofile << "H: "<< file_in << "\n" ;
-
 	//Tamanho do programa
 	ofile << "H: "<< to_string(tamanho_programa) << "\n" ;
 
@@ -2095,7 +2094,6 @@ void segunda_passagem(string file_in, string file_out)
 	ofile << "T: ";
 	while (std::getline(infile, line))
 	{
-
 		//ANÁLISE LÉXICA
 		vector<string> token_vector = separate_tokens(line);
 		//lexer(token_vector, n_linha);
@@ -2115,7 +2113,7 @@ void segunda_passagem(string file_in, string file_out)
 		{
 			if (!str.compare((*it_i).mnemonico))
 			{
-				if ((!str.compare("JMP")) || (!str.compare("JMPZ")) || (!str.compare("JMPP")) || (!str.compare("JMPN")))
+				/*if ((!str.compare("JMP")) || (!str.compare("JMPZ")) || (!str.compare("JMPP")) || (!str.compare("JMPN")))
 				{
 					it++;
 					if ((data_pc > -1) && (procura_simbolo(it) >= data_pc))
@@ -2140,7 +2138,9 @@ void segunda_passagem(string file_in, string file_out)
 							printf("Erro! \n Divisão por constante igual a 0. \n Linha: %d \n", n_linha);
 					}
 					it--;
-				}
+				}*/
+
+				/*
 				if (distance(it, it_end) != ((*it_i).n_operando + 1))
 				{
 					aux.push_back((*it_i).opcode);
@@ -2202,29 +2202,35 @@ void segunda_passagem(string file_in, string file_out)
 					}
 				}
 				else
+				{*/
+				aux.push_back((*it_i).opcode); //coloca o opcode no vetor aux
+				for (int i = 0; i < (*it_i).n_operando; i++)
 				{
-					aux.push_back((*it_i).opcode); //coloca o opcode no vetor aux
-					for (int i = 0; i < (*it_i).n_operando; i++)
+					//todo corrigir problema de segfault aqui
+					++it;
+					if (it == it_end)
+						//it--;
+						break;
+					symbol_value = procura_simbolo(it);
+					if (symbol_value == -1)
 					{
-						++it;
-						symbol_value = procura_simbolo(it);
-						if (symbol_value == -1)
-						{
-							printf("Erro! \n Símbolo não declarado. \n Linha: %d \n", n_linha);
-							aux.push_back("ND");
-						}
+						printf("Erro! \n Símbolo não declarado. \n Linha: %d \n", n_linha);
+						aux.push_back("ND");
+					}
+					else
+					{
+						if ((n_linha <= data) || (data == -1))
+							aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
 						else
-						{
-							if ((n_linha <= data) || (data == -1))
-								aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
-							else
-								printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); 
-						}
+							printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); 
 					}
 				}
+				//}
 				found = 1;
+				break;
 			}
 		}
+		
 		//VERIFICA SE É DIRETIVA
 		if (!found)
 		{
@@ -2318,6 +2324,7 @@ void montagem(string filein, string fileout, int n_files)
 	inicia_tabela_instrucao();
 	primeira_passagem(filein, n_files);
 	segunda_passagem(filein, fileout);
+	cout << "*******segunda passagem"<<endl;
 }
 
 /*
@@ -2625,6 +2632,10 @@ int main(int argc, char *argv[])
 		tabela_definicoes_vector.clear();
 		tabela_simbolo_vector.clear();
 		info_relocacao.clear();
+
+		data = -1;
+		data_pc = -1;
+
 
 		cout << "\n\n\n********************" << endl;
 		//****************************

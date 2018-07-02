@@ -4,3 +4,10 @@ O programa do montador está nomeado como trabalho2.cpp
 O programa do ligador está nomeado como ligador.cpp
     - instruções de uso estão detalhadas no escopo do arquivo ligador.cpp
     - tem com saida um arquivo de nome 'saida' com a extensão .o
+O programa da calculadora está nomeado como calculadora.asm
+    - instruções de uso estão detalhadas no escopo do arquivo calculadora.asm
+    - não fornece saída de arquivos, apenas interação via terminal
+    - faz as operações de SOMA, SUBTRAÇÃO, MULTIPLICAÇÃO, DIVISÃO E MOD
+    - contém as funções exigidas na especificação do trabalho 2
+    ** a função que lê números inteiros não faz a conversão direta do valor da string para um número inteiro em um registrador ou memória
+    ** para isso foram feitas funções adicionais que pegam o valor de string que representa o número inteiro com sinal e converte de maneira hardcoded para cada um dos dois números salvos (essas funções adicionais são especificamente string_to_int1 e string_to_int2)

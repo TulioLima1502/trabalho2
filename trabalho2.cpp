@@ -2,7 +2,7 @@
 
 // Desenvolvedores: Túlio Mariano da Silva Lima e Débora Ferreira dos Santos
 
-// Descrição do trabalho 2
+// Descrição do trabalho 2 - montador
 // Objetivos: Adaptar o trabalho 1 para que o montador seja capaz de gerar arquivos
 // com informações de cabeçalho para um ligador.
 // A montagem é feita em duas passagens.

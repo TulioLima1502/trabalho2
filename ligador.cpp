@@ -1,3 +1,27 @@
+// Codigo em C++ do Segundo Trabalho de Software Basico
+
+// Desenvolvedores: Túlio Mariano da Silva Lima e Débora Ferreira dos Santos
+
+// Descrição do trabalho 2 - ligador
+// Objetivos: Gerar um ligador capaz de ligar 1 ou 2 arquivos
+
+// O CÓDIGO DA DUPLA ENCONTRA-SE DISPONÍVEL NO GITHUB, NO SEGUINTE REPOSITÓRIO:
+//
+// 		https://github.com/TulioLima1502/trabalho2
+//
+// INSTRUÇÕES DE USO/COMPILAÇÃO
+// É NECESSÁRIO DE UM COMPUTADOR COM LINUX (UBUNTU 14 e 18)
+// É NECESSAŔIO TER OS PACOTES DE C++ PARA REALIZAR A COMPILAÇÃO E EXECUÇÃO PELA LINHA DE COMANDO
+// É NECESSÁRIO REALIZAR A COMPILAÇÃO PARA SÓ EM SEGUIDA EXECUTAR
+// O COMANDO DE COMPILAÇÃO É: g++ -std=c++11 ligador.cpp -o <nome do executável>
+// PARA EXECUÇÃO DO TRABALHO BASTA ENTRAR COM O NOME DO EXECUTÁVEL E O NOME DOS ARQUIVOS 
+// .o A SEREM MONTADOS SEM EXTENSÃO, SENDO O NOME DO SEGUNDO ARQUIVO OPCIONAL
+//
+// 			./<nome do executável> <nome do arquivo1> <nome do arquivo2>
+//
+// ** PARA CORRETO FUNCIONAMENTO É NECESSAŔIO TER UM ARQUIVO COM EXTENSÃO .o NA MESMA PASTA DO PROGRAMA ligador.cpp
+
+
 #include <iostream>
 #include <istream>
 #include <fstream>
@@ -14,7 +38,7 @@
 using namespace std;
 
 #define TABELA 0
-#define MENSAGENS 1
+#define MENSAGENS 0 
 
 typedef struct tabela_uso
 {
@@ -56,7 +80,7 @@ vector<string> separate_tokens(string line)
 
 void ligador1(string file_in)
 {
-	string file_out = file_in + "out.txt"; //TODO criar nome de saída corretamente
+	string file_out = "saida.txt"; //todo corrigir formato
 	ofstream ofile(file_out);
 
 	file_in = file_in + ".txt";	//todo corrigir formato
@@ -266,7 +290,7 @@ void ligador2(string file_1, string file_2)
 	string variavel;
 	int is_uso =0;
 
-	string file_out = "ligado.txt"; //TODO criar nome de saída corretamente
+	string file_out = "saida.txt"; //TODO corrigir extensao
 	ofstream ofile(file_out);
 	//************************
 	//COMEÇA A LIGAR ARQUIVO 1

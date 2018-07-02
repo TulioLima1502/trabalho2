@@ -58,9 +58,10 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push msg_size
         call print
 
-        ;mov eax,214
-        ;push eax
-        ;call print_int
+        mov eax,-2143
+        ;add eax,-1
+        push eax
+        call print_int
 
         mov edx,100             ;espera e lê o nome digitado pelo usuário até o enter
         push nome
@@ -635,6 +636,7 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         int 80h
 
         mov eax,[ebp+8]
+        add eax,-1
         not eax
         positivo:
 
@@ -777,6 +779,7 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
 
 
         string_to_int1:
+        mov byte [i],0
 
         push ebp
         mov ebp,esp
@@ -793,6 +796,8 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         iteracao1:
         xor ebx,ebx
         mov bl,[esi + ecx]
+        cmp bl,45
+        je sinalmenos
         cmp bl,57
         jg acabou_iteracao1
         cmp bl,48
@@ -807,13 +812,26 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         add eax,ebx
         mov ebx,10
         mul ebx
-        inc ecx
+
+        jmp saltar
         
+        sinalmenos:
+        mov byte [i],1
+
+        saltar:
+        inc ecx
+
+
         jmp iteracao1
 
         acabou_iteracao1:
         mov ebx,10
         div ebx
+        cmp byte [i],1
+        jne n_negativo
+        mov ecx,0FFFFFFFFH
+        imul ecx
+        n_negativo:
         mov DWORD [number_1],eax
 
         pop edx
@@ -826,7 +844,7 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
 
 
         string_to_int2:
-
+        mov byte [i],0
         push ebp
         mov ebp,esp
         push eax
@@ -842,6 +860,8 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         iteracao2:
         xor ebx,ebx
         mov bl,[esi + ecx]
+        cmp bl,45
+        je sinalmenos2
         cmp bl,57
         jg acabou_iteracao2
         cmp bl,48
@@ -856,6 +876,12 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         add eax,ebx
         mov ebx,10
         mul ebx
+        jmp saltar2
+        
+        sinalmenos2:
+        mov byte [i],1
+
+        saltar2:
         inc ecx
         
         jmp iteracao2
@@ -863,6 +889,11 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         acabou_iteracao2:
         mov ebx,10
         div ebx
+        cmp byte [i],1
+        jne n_negativo2
+        mov ecx,0FFFFFFFFH
+        imul ecx
+        n_negativo2:
         mov DWORD [number_2],eax
 
         pop edx

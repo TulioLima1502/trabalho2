@@ -55,7 +55,7 @@ typedef struct tabela_definicoes
 
 bool file_exist(std::string fileName)
 {
-	fileName = fileName + ".txt" ; //corrigir e trocar pra .o
+	fileName = fileName + ".o" ; 
 	std::ifstream infile(fileName);
 	return infile.good();
 }
@@ -80,10 +80,10 @@ vector<string> separate_tokens(string line)
 
 void ligador1(string file_in)
 {
-	string file_out = "saida.txt"; //todo corrigir formato
+	string file_out = "saida.o"; 
 	ofstream ofile(file_out);
 
-	file_in = file_in + ".txt";	//todo corrigir formato
+	file_in = file_in + ".o";	
 	std::ifstream infile(file_in);
 	std::string line;
 	string str;
@@ -117,8 +117,7 @@ void ligador2(string file_1, string file_2)
 	//***********************************
 	//COPIA CABEÇALHO DO PRIMEIRO ARQUIVO
 	//***********************************
-	string file_in = file_1 + ".txt"; //todo corrigir formato	
-
+	string file_in = file_1 + ".o"; 
 	std::ifstream infile(file_in);
 	std::getline(infile, line);
 	std::getline(infile, line);
@@ -207,7 +206,7 @@ void ligador2(string file_1, string file_2)
 	//***********************************
 	//COPIA CABEÇALHO DO SEGUNDO ARQUIVO
 	//***********************************
-	string file_in2 = file_2 + ".txt"; //todo corrigir formato	
+	string file_in2 = file_2 + ".o"; 	
 
 	std::ifstream infile2(file_in2);
 	std::getline(infile2, line);
@@ -290,7 +289,7 @@ void ligador2(string file_1, string file_2)
 	string variavel;
 	int is_uso =0;
 
-	string file_out = "saida.txt"; //TODO corrigir extensao
+	string file_out = "saida.o"; 
 	ofstream ofile(file_out);
 	//************************
 	//COMEÇA A LIGAR ARQUIVO 1

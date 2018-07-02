@@ -2544,7 +2544,7 @@ int main(int argc, char *argv[])
 		//FUNÇOES DA MONTAGEM
 		string file_ = argv[1];
 		file_in = file_ + ".mcr"; 
-		string file_out = file_ + ".txt"; //todo trocar pra '.o'
+		string file_out = file_ + ".o"; 
 		montagem(file_in, file_out, n_files, file_name);
 
 
@@ -2591,7 +2591,7 @@ int main(int argc, char *argv[])
 		file_name = argv[1]; // passar para learquivo(). eh o nome do arquivo .asm.
 		string file_1 = file_name + ".asm";
 		string file_in1 = file_name + ".mcr";
-		string file_out1 = file_name + ".txt"; //todo trocar pra '.o'
+		string file_out1 = file_name + ".o"; 
 	
 		if (!file_exist(file_name))
 		{
@@ -2642,7 +2642,7 @@ int main(int argc, char *argv[])
 		file_name = argv[2];
 		string file_2 = file_name + ".asm";
 		string file_in2 = file_name + ".mcr"; 
-		string file_out2 = file_name + ".txt"; //todo trocar pra '.o'
+		string file_out2 = file_name + ".o"; 
 
 		if (!file_exist(file_name))
 		{

@@ -1983,7 +1983,7 @@ void primeira_passagem(string file_in, int n_files)
 			cout << "Erro! \n Diretiva END não encontrada. \n";
 	}
 
-	tamanho_programa = pc -1; //TODO VERIFICAR SE ESTÁ CORRETO
+	tamanho_programa = pc; //TODO VERIFICAR SE ESTÁ CORRETO
 }
 
 
@@ -2248,7 +2248,7 @@ void segunda_passagem(string file_in, string file_out)
 		{
 			if (!str.compare("CONST"))
 			{
-				if ((n_linha >= data) && (data != -1))
+				/*if ((n_linha >= data) && (data != -1))
 				{
 					if (distance(it, it_end) != 2)
 					{
@@ -2256,7 +2256,7 @@ void segunda_passagem(string file_in, string file_out)
 							printf("Erro Sintático! \n Quantidade de operandos inválida. \n Linha: %d \n", n_linha);
 					}
 					else
-					{
+					{*/
 						++it;
 						if ((*it).size() > 1)
 						{
@@ -2269,11 +2269,11 @@ void segunda_passagem(string file_in, string file_out)
 						}
 						else
 							aux.push_back(*it);
-					}
+					/*}
 				}
 				else
 					if (TRABALHO1)
-						printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); 
+						printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); */
 			}
 			else
 			{
@@ -2282,8 +2282,6 @@ void segunda_passagem(string file_in, string file_out)
 
 					/*if ((n_linha >= data) && (data != -1))
 					{*/
-						cout << "ENTROU NO IF" << endl;
-						cout << str << endl;
 						++it;
 						if (it != token_vector.end()) //verifica se tem algum operando na diretiva space
 						{

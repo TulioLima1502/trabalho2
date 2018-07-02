@@ -2279,8 +2279,11 @@ void segunda_passagem(string file_in, string file_out)
 			{
 				if (!str.compare("SPACE"))
 				{
-					if ((n_linha >= data) && (data != -1))
-					{
+
+					/*if ((n_linha >= data) && (data != -1))
+					{*/
+						cout << "ENTROU NO IF" << endl;
+						cout << str << endl;
 						++it;
 						if (it != token_vector.end()) //verifica se tem algum operando na diretiva space
 						{
@@ -2291,12 +2294,12 @@ void segunda_passagem(string file_in, string file_out)
 						{
 							aux.push_back("X");
 						}
-					}
+					/*}
 					else
 					{
 						if (TRABALHO1)
 							printf("Erro Sintático! \n Diretiva SPACE na sessão errada. \n Linha: %d \n", n_linha); 
-					}
+					}*/
 				}
 				else
 				{

@@ -419,7 +419,7 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         mov eax,[number_1]
         mov ebx,[number_2]
         cdq
-        div ebx
+        idiv ebx
         mov DWORD [result],eax
 
         push eax
@@ -492,7 +492,7 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         mov eax,[number_1]
         mov ebx,[number_2]
         cdq
-        div ebx
+        idiv ebx
         mov DWORD [result],edx
 
         push edx

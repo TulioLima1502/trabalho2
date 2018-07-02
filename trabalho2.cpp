@@ -1,32 +1,32 @@
-//Codigo em C++ do Primeiro Trabalho de Software Basico
+//Codigo em C++ do Segundo Trabalho de Software Basico
 
 // Desenvolvedores: Túlio Mariano da Silva Lima e Débora Ferreira dos Santos
 
-// Descrição do trabalho 1
-// Objetivos: Fazer um programa que personifique o um montador fazendo uso de uma ou duas passagens
-// além de realizar a expansão de macros e um pre-processamento
+// Descrição do trabalho 2
+// Objetivos: Adaptar o trabalho 1 para que o montador seja capaz de gerar arquivos
+// com informações de cabeçalho para um ligador.
+// A montagem é feita em duas passagens.
+// Podem ser montados apenas 1 ou 2 arquivos .asm
 
-// Funcoes: Pre-processamento de arquivos .asm e retorna um arquivo .pre
-// Expansão de macros de arquivos .asm e retorna um arquivo .mcr
+// Funcoes: Pre-processamento de arquivos .asm e retorna um arquivo .mcr
 // Montagem conforme o algoritmo de duas passagens e retorna um arquivo .o
 // O CÓDIGO DA DUPLA ENCONTRA-SE DISPONÍVEL NO GITHUB, NO SEGUINTE REPOSITÓRIO:
 //
-// 		https://github.com/TulioLima1502/trabalho1
-//
-// PARA A CONFECÇÃO DO TRABALHO 1 FOI UTILIZADO O VISUAL STUDIO CODE (	diferente do visual studio community, mas igualmente gratuito)
+// 		https://github.com/TulioLima1502/trabalho2
 //
 // INSTRUÇÕES DE USO/COMPILAÇÃO
-// É NECESSÁRIO DE UM COMPUTADOR COM LINUX (UBUNTU 16 e 18)
+// É NECESSÁRIO DE UM COMPUTADOR COM LINUX (UBUNTU 14 e 18)
 // É NECESSAŔIO TER OS PACOTES DE C++ PARA REALIZAR A COMPILAÇÃO E EXECUÇÃO PELA LINHA DE COMANDO
 // É NECESSÁRIO REALIZAR A COMPILAÇÃO PARA SÓ EM SEGUIDA EXECUTAR
-// O COMANDO DE COMPILAÇÃO É: g++ -std=c++11 trabalho1.cpp -o <nome do executável>
-// DEPOIS DE COMPILADO BASTA EXECUTAR O PROGRAMA COM O COMANDO:
+// O COMANDO DE COMPILAÇÃO É: g++ -std=c++11 trabalho2.cpp -o <nome do executável>
+// PARA EXECUÇÃO DO TRABALHO BASTA ENTRAR COM O NOME DO EXECUTÁVEL E O NOME DOS ARQUIVOS 
+// .ASM A SEREM MONTADOS SEM EXTENSÃO, SENDO O NOME DO SEGUNDO ARQUIVO OPCIONAL
 //
-//				./<nome do executável> -x <nome do arquivo>.asm <nome do arquivo de saida>
+// 			./<nome do executável> <nome do arquivo1> <nome do arquivo2>
 //
-// ** PARA CORRETO FUNCIONAMENTO É NECESSAŔIO TER UM ARQUIVO TEXTO COM EXTENSÃO .ASM NA MESMA PASTA DO PROGRAMA TRABALHO1.CPP
+// ** PARA CORRETO FUNCIONAMENTO É NECESSAŔIO TER UM ARQUIVO TEXTO COM EXTENSÃO .ASM NA MESMA PASTA DO PROGRAMA TRABALHO2.CPP
 
-#define DEBUG 1 
+#define DEBUG 0
 #define TRABALHO1 0 //Mensagens de erro do trabalho 1 
 
 #include <iostream>
@@ -1803,7 +1803,7 @@ void primeira_passagem(string file_in, int n_files)
 				}
 				if (!simbolo_redefinido)
 				{
-					//pc++; //TODO PENSAR SE O PC TA CORRETO corrigir 
+					//pc++; 
 					//str.erase(std::prev(str.end()));
 					//GUIA INCLUI NA TABELA DE SIMBOLOS
 					//SIMBOLO SENDO DEFINIDO NO PROGRAMA
@@ -1924,7 +1924,7 @@ void primeira_passagem(string file_in, int n_files)
 							if (n_files == 2)
 							{
 								pc = pc;
-								//TODO implementar
+								
 							}
 							else
 							{
@@ -1939,7 +1939,7 @@ void primeira_passagem(string file_in, int n_files)
 								if (n_files == 2)
 								{
 									pc = pc;
-									//TODO implementar
+									
 								}
 								else
 								{
@@ -1990,7 +1990,7 @@ void primeira_passagem(string file_in, int n_files)
 			cout << "Erro! \n Diretiva END não encontrada. \n";
 	}
 
-	tamanho_programa = pc; //TODO VERIFICAR SE ESTÁ CORRETO
+	tamanho_programa = pc; 
 }
 
 int procura_simbolo(vector<string>::iterator it)
@@ -2044,7 +2044,7 @@ int procura_simbolo_valor_const(vector<string>::iterator it)
 }
 
 
-void segunda_passagem(string file_in, string file_out)
+void segunda_passagem(string file_in, string file_out, string file_name)
 {
 	cout << "Começando a fazer a segunda passagem no arquivo: ";
 	cout << file_in << endl;
@@ -2071,8 +2071,7 @@ void segunda_passagem(string file_in, string file_out)
 
 	//ESCREVE O CABEÇALHO
 	//Nome programa
-	//TODO corrigir nome do programa
-	ofile << "H: "<< file_in << "\n" ;
+	ofile << "H: "<< file_name << "\n" ; //estou aqui
 	//Tamanho do programa
 	ofile << "H: "<< to_string(tamanho_programa) << "\n" ;
 
@@ -2177,7 +2176,7 @@ void segunda_passagem(string file_in, string file_out)
 							symbol_value = procura_simbolo(it);
 							if (symbol_value == -2)
 							{
-								//estou aqui
+							
 								printf("Erro! \n Símbolo não declarado. \n Linha: %d \n", n_linha);
 								aux.push_back("ND");
 							}
@@ -2223,7 +2222,6 @@ void segunda_passagem(string file_in, string file_out)
 				aux.push_back((*it_i).opcode); //coloca o opcode no vetor aux
 				for (int i = 0; i < (*it_i).n_operando; i++)
 				{
-					//todo corrigir problema de segfault aqui
 					++it;
 					if (it == it_end)
 						//it--;
@@ -2342,13 +2340,12 @@ void segunda_passagem(string file_in, string file_out)
 }
 
 
-void montagem(string filein, string fileout, int n_files)
+void montagem(string filein, string fileout, int n_files, string file_name)
 {
 	inicia_tabela_diretiva();
 	inicia_tabela_instrucao();
 	primeira_passagem(filein, n_files);
-	segunda_passagem(filein, fileout);
-	cout << "*******segunda passagem"<<endl;
+	segunda_passagem(filein, fileout, file_name);
 }
 
 /*
@@ -2414,7 +2411,7 @@ int main(int argc, char *argv[])
 			//FUNÇOES DA MONTAGEM
 			string file_ = argv[3];
 			file_in = file_ + ".mcr";
-			string file_out = file_ + ".txt"; //todo trocar pra '.o'
+			string file_out = file_ + ".txt"; 
 			montagem(file_in, file_out, n_files);
 			//Realiza a montagem do código depois de expandir as macros
 		}
@@ -2453,7 +2450,7 @@ int main(int argc, char *argv[])
 			//FUNÇOES DA MONTAGEM
 			string file_ = argv[1];
 			file_in = file_ + ".mcr";
-			string file_out = file_ + ".txt"; //todo trocar pra '.o'
+			string file_out = file_ + ".txt"; 
 			montagem(file_in, file_out, n_files);
 			//Realiza a montagem do código depois de expandir as macros
 
@@ -2546,9 +2543,9 @@ int main(int argc, char *argv[])
 		//expande_macro(argv[1]);
 		//FUNÇOES DA MONTAGEM
 		string file_ = argv[1];
-		file_in = file_ + ".mcr"; //todo conferir -> troquei a saída do pre_procesamento pra .mcr 
+		file_in = file_ + ".mcr"; 
 		string file_out = file_ + ".txt"; //todo trocar pra '.o'
-		montagem(file_in, file_out, n_files);
+		montagem(file_in, file_out, n_files, file_name);
 
 
 		//IMPRIME TABELAS PARA DEBUG
@@ -2593,20 +2590,9 @@ int main(int argc, char *argv[])
 		//Descobrir como fazer para 2 arquivos depois de ter feito para 1 arquivo
 		file_name = argv[1]; // passar para learquivo(). eh o nome do arquivo .asm.
 		string file_1 = file_name + ".asm";
-		string file_in1 = file_name + ".mcr"; //todo conferir -> troquei a saída do pre_procesamento pra .mcr 
+		string file_in1 = file_name + ".mcr";
 		string file_out1 = file_name + ".txt"; //todo trocar pra '.o'
 	
-		if (!file_exist(file_name))
-		{
-			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
-			return 0;
-		}
-
-		file_name = argv[2];
-		string file_2 = file_name + ".asm";
-		string file_in2 = file_name + ".mcr"; //todo conferir -> troquei a saída do pre_procesamento pra .mcr 
-		string file_out2 = file_name + ".txt"; //todo trocar pra '.o'
-
 		if (!file_exist(file_name))
 		{
 			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
@@ -2617,7 +2603,7 @@ int main(int argc, char *argv[])
 		//MONTAGEM DO PRIMEIRO ARQUIVO
 		lineachousection = lerarquivo(file_1, argv[1]);
 		pre_procesamento(argv[1], lineachousection);
-		montagem(file_in1, file_out1, n_files);
+		montagem(file_in1, file_out1, n_files, file_name);
 
 		//IMPRIME TABELAS PARA DEBUG
 		if (DEBUG)
@@ -2653,6 +2639,19 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		file_name = argv[2];
+		string file_2 = file_name + ".asm";
+		string file_in2 = file_name + ".mcr"; 
+		string file_out2 = file_name + ".txt"; //todo trocar pra '.o'
+
+		if (!file_exist(file_name))
+		{
+			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
+			return 0;
+		}
+
+
+
 		tabela_uso_vector.clear();
 		tabela_definicoes_vector.clear();
 		tabela_simbolo_vector.clear();
@@ -2662,12 +2661,12 @@ int main(int argc, char *argv[])
 		data_pc = -1;
 
 
-		cout << "\n\n\n********************" << endl;
+		cout << "********************" << endl;
 		//****************************
 		//MONTAGEM DO SEGUNDO ARQUIVO
 		lineachousection = lerarquivo(file_2, argv[2]);
 		pre_procesamento(argv[2], lineachousection);
-		montagem(file_in2, file_out2, n_files);
+		montagem(file_in2, file_out2, n_files, file_name);
 
 		//IMPRIME TABELAS PARA DEBUG
 		if (DEBUG)

@@ -1,3 +1,44 @@
+; Código em IA32 do Segundo Trabalho de Software básico - Parte 2.3
+;
+; Desenvolvedores: Túlio Mariano da Silva Lima e Débora Ferreira dos Santos
+;
+; Descrição do Trabalho 2
+; Objetivos: Fazer um programa em IA-32 que represente uma calculadora com as
+; operações de SOMA, SUBTRAÇÃO, MULTIPLICAÇÃO, DIVISÂO e MOD
+;
+; O programa faz uso de funções para 'printar' números inteiros com sinal (print_int) e strings (print)
+; além de funções para leitura de strings(read) e de números inteiros com sinal(readdword+string_to_intx).
+; A funções string_to_int1 e string_to_int2 fazem a conversão da string do número lido e em seguida converte a string em número
+;
+; O programa pede o nome do usuário no início e mostra uma mensagem de boas vindas
+; Em seguida um menu de operações é mostrado como detalhado a seguir:
+;
+; ESCOLHA UMA OPÇÃO:
+; - 1: SOMA
+; - 2: SUBTRAÇÃO
+; - 3: MULTIPLICAÇÃO
+; - 4: DIVISÂO
+; - 5: MOD
+; - 6: SAIR
+;
+; Ao escolher qualquer uma das opções o usuário é questionado sobre os dois núemros no qual deseja operar
+; Depois de fornecer os dois números, o resultado é mostrado.
+;
+; O CÓDIGO DA DUPLA ENCONTRA-SE DISPONÍVEL NO GITHUB, NO SEGUINTE REPOSITÓRIO:
+;
+;
+; PARA A CONFECÇÃO DO TRABALHO 2 FOI UTILIZADO O VISUAL STUDIO CODE ( Diferente do visual studio community, mas igualmente gratuito)
+;
+; INSTRUÇÕES DE USO/COMPILAÇÃO
+; É NECESSÁRIO DE UM COMPUTADOR COM LINUX (UBUNTU 16 e 18)
+; É NECESSÁRIO REALIZAR A COMPILAÇÃO PARA SÓ EM SEGUIDA LIGAR E POR FIM EXECUTAR
+; O COMANDO DE COMPILAÇÃO É: nasm -f elf -o calculadora.o calculadora.asm
+; O COMANDO PARA LIGAR É: ld -m elf_i386 -o calculadora calculadora.o
+; o COMANDO PARA EXECUTAR É: ./calculadora
+;
+;
+
+
 section .data
 msg db 'Digite o seu nome:',0dH,0ah
 msg_size EQU $-msg
@@ -58,10 +99,10 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push msg_size
         call print
 
-        mov eax,-2143
+        ;mov eax,-2143
         ;add eax,-1
-        push eax
-        call print_int
+        ;push eax
+        ;call print_int
 
         mov edx,100             ;espera e lê o nome digitado pelo usuário até o enter
         push nome
@@ -164,9 +205,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int1
 
-        mov eax,[number_1]
-        push eax
-        call print_int
+        ;mov eax,[number_1]
+        ;push eax
+        ;call print_int
 
         push msg_segundo_numero
         push msg_segundo_numero_size
@@ -186,9 +227,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int2
 
-        mov eax,[number_2]
-        push eax
-        call print_int
+        ;mov eax,[number_2]
+        ;push eax
+        ;call print_int
 
         push mensagem_resultado
         push mensagem_resultado_size
@@ -236,9 +277,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int1
 
-        mov eax,[number_1]
-        push eax
-        call print_int
+        ;mov eax,[number_1]
+        ;push eax
+        ;call print_int
 
         push msg_segundo_numero
         push msg_segundo_numero_size
@@ -258,9 +299,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int2
 
-        mov eax,[number_2]
-        push eax
-        call print_int
+        ;mov eax,[number_2]
+        ;push eax
+        ;call print_int
 
         push mensagem_resultado
         push mensagem_resultado_size
@@ -312,9 +353,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int1
 
-        mov eax,[number_1]
-        push eax
-        call print_int
+        ;mov eax,[number_1]
+        ;push eax
+        ;call print_int
 
         push msg_segundo_numero
         push msg_segundo_numero_size
@@ -334,9 +375,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int2
 
-        mov eax,[number_2]
-        push eax
-        call print_int
+        ;mov eax,[number_2]
+        ;push eax
+        ;call print_int
 
         push mensagem_resultado
         push mensagem_resultado_size
@@ -386,9 +427,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int1
 
-        mov eax,[number_1]
-        push eax
-        call print_int
+        ;mov eax,[number_1]
+        ;push eax
+        ;call print_int
 
         push msg_segundo_numero
         push msg_segundo_numero_size
@@ -408,9 +449,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int2
 
-        mov eax,[number_2]
-        push eax
-        call print_int
+        ;mov eax,[number_2]
+        ;push eax
+        ;call print_int
 
         push mensagem_resultado
         push mensagem_resultado_size
@@ -459,9 +500,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int1
 
-        mov eax,[number_1]
-        push eax
-        call print_int
+        ;mov eax,[number_1]
+        ;push eax
+        ;call print_int
 
         push msg_segundo_numero
         push msg_segundo_numero_size
@@ -481,9 +522,9 @@ _start: push msg                ;faz o print da mensagem que pede para digitar o
         push edx
         call string_to_int2
 
-        mov eax,[number_2]
-        push eax
-        call print_int
+        ;mov eax,[number_2]
+        ;push eax
+        ;call print_int
 
         push mensagem_resultado
         push mensagem_resultado_size

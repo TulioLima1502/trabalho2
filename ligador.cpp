@@ -365,7 +365,10 @@ void ligador2(string file_1, string file_2)
 					}	
 					if (! is_uso)
 					{
-						ofile << stoi(*it)+fator_relocacao << " ";	
+						if (isalpha((*it)[0]))
+							ofile << *it<< " ";	
+						else
+							ofile << stoi(*it)+fator_relocacao << " ";	
 					}
 					is_uso=0;
 				}

@@ -27,6 +27,7 @@
 // ** PARA CORRETO FUNCIONAMENTO É NECESSAŔIO TER UM ARQUIVO TEXTO COM EXTENSÃO .ASM NA MESMA PASTA DO PROGRAMA TRABALHO1.CPP
 
 #define DEBUG 0
+#define TRABALHO1 0
 
 #include <iostream>
 #include <istream>
@@ -359,7 +360,8 @@ int lerarquivo(std::string file_name, char *file_name2)
 
 	if (achoutext == 0)
 	{
-		cout << "ERRO, FALTOU A SECTION TEXT" << endl;
+		if (TRABALHO1)
+			cout << "ERRO, FALTOU A SECTION TEXT" << endl;
 	}
 	//if (achoudata == 0)
 	//{
@@ -367,11 +369,13 @@ int lerarquivo(std::string file_name, char *file_name2)
 	//	}
 	if (errosection == 1)
 	{
-		cout << "ERRO na difinição do Section" << endl;
+		if (TRABALHO1)
+			cout << "ERRO na difinição do Section" << endl;
 	}
 	if (erro_ordem_section == 1)
 	{
-		cout << "ERRO, A DIRETIVA 'TEXT' DEVE SEMPRE VIR ANTES DA DIRETIVA 'DATA'" << endl;
+		if (TRABALHO1)
+			cout << "ERRO, A DIRETIVA 'TEXT' DEVE SEMPRE VIR ANTES DA DIRETIVA 'DATA'" << endl;
 	}
 
 	return lineachousection;
@@ -1543,7 +1547,10 @@ void lexer(std::vector<std::string> token_vector, int n_linha)
 						{
 							//se for primeira string e ':' no final, então ok. Se não for isso erro
 							if (!((it == token_vector.begin()) && ((*it).back() == (*it3))))
-								printf("Erro léxico! \n Token inválido. Token deve ser composto por dígitos, letras ou underscore. \n Linha: %d.", n_linha);
+							{
+								if (TRABALHO1)
+									printf("Erro léxico! \n Token inválido. Token deve ser composto por dígitos, letras ou underscore. \n Linha: %d.", n_linha);
+							}
 						}
 
 					}
@@ -1557,8 +1564,8 @@ void lexer(std::vector<std::string> token_vector, int n_linha)
 					{
 						if ((*it).find("0X") != 0)
 						{
-							printf("Erro léxico! \n Token inválido. Token deve ser iniciado por dígito ou underscore. \n Linha: %d.", n_linha);
-							cout << "\n\nFoi aqui:  " << *it;
+							if (TRABALHO1)
+								printf("Erro léxico! \n Token inválido. Token deve ser iniciado por dígito ou underscore. \n Linha: %d.", n_linha);
 						}
 						else
 							break;
@@ -1567,7 +1574,10 @@ void lexer(std::vector<std::string> token_vector, int n_linha)
 			}
 		}
 		else
-			printf("Erro léxico! \n Token inválido. Token deve ter no máximo 20 caracteres. \n Linha: %d.", n_linha);
+		{
+			if (TRABALHO1)
+				printf("Erro léxico! \n Token inválido. Token deve ter no máximo 20 caracteres. \n Linha: %d.", n_linha);
+		}
 	}
 }
 
@@ -1778,7 +1788,8 @@ void primeira_passagem(string file_in, int n_files)
 					{
 						if (!str.compare((*it_s).simbolo)) //ja está definido na tabela
 						{
-							printf("Erro Semântico! \n Símbolo redefinido. \n Linha: %d \n", n_linha);
+							if (TRABALHO1)
+								printf("Erro Semântico! \n Símbolo redefinido. \n Linha: %d \n", n_linha);
 							simbolo_redefinido = 1;
 						}
 					}
@@ -2222,7 +2233,8 @@ void segunda_passagem(string file_in, string file_out)
 						if ((n_linha <= data) || (data == -1))
 							aux.push_back(to_string(symbol_value)); //transforma o valor correspondente do simbolo pra string e coloca no vetor aux
 						else
-							printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); 
+							if (TRABALHO1)
+								printf("Erro Sintático! \n Instrução na sessão errada. \n Linha: %d \n", n_linha); 
 					}
 				}
 				//}
@@ -2240,7 +2252,8 @@ void segunda_passagem(string file_in, string file_out)
 				{
 					if (distance(it, it_end) != 2)
 					{
-						printf("Erro Sintático! \n Quantidade de operandos inválida. \n Linha: %d \n", n_linha);
+						if (TRABALHO1)
+							printf("Erro Sintático! \n Quantidade de operandos inválida. \n Linha: %d \n", n_linha);
 					}
 					else
 					{
@@ -2259,7 +2272,8 @@ void segunda_passagem(string file_in, string file_out)
 					}
 				}
 				else
-					printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); 
+					if (TRABALHO1)
+						printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); 
 			}
 			else
 			{
@@ -2279,7 +2293,10 @@ void segunda_passagem(string file_in, string file_out)
 						}
 					}
 					else
-						printf("Erro Sintático! \n Diretiva SPACE na sessão errada. \n Linha: %d \n", n_linha); 
+					{
+						if (TRABALHO1)
+							printf("Erro Sintático! \n Diretiva SPACE na sessão errada. \n Linha: %d \n", n_linha); 
+					}
 				}
 				else
 				{
@@ -2507,16 +2524,17 @@ int main(int argc, char *argv[])
 		n_files = 1;
 
 		file_name = argv[1]; // passar para learquivo(). eh o nome do arquivo .asm.
-		file_in = file_name;
+		file_in = file_name + ".asm";
+		
 		//cout << "file_in: " << file_in << endl;
-		if (!file_exist(file_in))
+		if (!file_exist(file_name))
 		{
 			cout << "\nERRO.\nArquivo não existe nessa pasta!\n\n";
 			return 0;
 		}
 
 		//lerarquivo(argv[2],argv[3]);
-		lineachousection = lerarquivo(file_name, argv[1]);
+		lineachousection = lerarquivo(file_in, argv[1]);
 		pre_procesamento(argv[1], lineachousection);
 		//expande_macro(argv[1]);
 		//FUNÇOES DA MONTAGEM

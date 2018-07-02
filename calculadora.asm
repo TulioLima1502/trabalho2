@@ -26,6 +26,7 @@
 ;
 ; O CÓDIGO DA DUPLA ENCONTRA-SE DISPONÍVEL NO GITHUB, NO SEGUINTE REPOSITÓRIO:
 ;
+; https://github.com/TulioLima1502/trabalho2
 ;
 ; PARA A CONFECÇÃO DO TRABALHO 2 FOI UTILIZADO O VISUAL STUDIO CODE ( Diferente do visual studio community, mas igualmente gratuito)
 ;

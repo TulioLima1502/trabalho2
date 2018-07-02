@@ -103,7 +103,7 @@ void ligador2(string file_1, string file_2)
 	token_vector = separate_tokens(line);
 	it = token_vector.begin();
 	it++;
-	int fator_relocacao = stoi(*it) + 1; //fator de relocacao = arquivo + 1 ???
+	int fator_relocacao = stoi(*it)  ; //fator de relocacao = arquivo + 1 ???
 
 
 	//GERA MAPA DE RELOCAÇÃO 
@@ -368,7 +368,7 @@ void ligador2(string file_1, string file_2)
 						if (isalpha((*it)[0]))
 							ofile << *it<< " ";	
 						else
-							ofile << stoi(*it)+fator_relocacao << " ";	
+							ofile << stoi(*it)+fator_relocacao  << " ";	
 					}
 					is_uso=0;
 				}

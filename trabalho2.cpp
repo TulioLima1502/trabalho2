@@ -26,8 +26,8 @@
 //
 // ** PARA CORRETO FUNCIONAMENTO É NECESSAŔIO TER UM ARQUIVO TEXTO COM EXTENSÃO .ASM NA MESMA PASTA DO PROGRAMA TRABALHO1.CPP
 
-#define DEBUG 0
-#define TRABALHO1 0
+#define DEBUG 1 
+#define TRABALHO1 0 //Mensagens de erro do trabalho 1 
 
 #include <iostream>
 #include <istream>
@@ -1615,6 +1615,14 @@ void insere_tabela_definicoes(string str) //string depois de um PUBLIC
 		temp2.simbolo = str;
 		temp2.valor = -1;
 
+		for (vector<tabela_simbolo>::iterator it = tabela_simbolo_vector.begin(); it != tabela_simbolo_vector.end(); ++it)
+		{
+			if (!str.compare((*it).simbolo))
+			{
+				temp2.valor=(*it).valor;
+				break;
+			}
+		}
 		tabela_definicoes_vector.push_back(temp2);
 	}
 	else
@@ -1734,7 +1742,6 @@ void procura_uso(string str, int pc)
 		}
 	}
 }
-
 
 
 void primeira_passagem(string file_in, int n_files)
@@ -1983,9 +1990,8 @@ void primeira_passagem(string file_in, int n_files)
 			cout << "Erro! \n Diretiva END não encontrada. \n";
 	}
 
-	tamanho_programa = pc -1; //TODO VERIFICAR SE ESTÁ CORRETO
+	tamanho_programa = pc; //TODO VERIFICAR SE ESTÁ CORRETO
 }
-
 
 int procura_simbolo(vector<string>::iterator it)
 { //ße existir um tabela de simbolos, percorre ela toda procurando pelo simbolo. retorna -2 caso nao encontre na tabela
@@ -2248,7 +2254,7 @@ void segunda_passagem(string file_in, string file_out)
 		{
 			if (!str.compare("CONST"))
 			{
-				if ((n_linha >= data) && (data != -1))
+				/*if ((n_linha >= data) && (data != -1))
 				{
 					if (distance(it, it_end) != 2)
 					{
@@ -2256,7 +2262,7 @@ void segunda_passagem(string file_in, string file_out)
 							printf("Erro Sintático! \n Quantidade de operandos inválida. \n Linha: %d \n", n_linha);
 					}
 					else
-					{
+					{*/
 						++it;
 						if ((*it).size() > 1)
 						{
@@ -2269,18 +2275,19 @@ void segunda_passagem(string file_in, string file_out)
 						}
 						else
 							aux.push_back(*it);
-					}
+					/*}
 				}
 				else
 					if (TRABALHO1)
-						printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); 
+						printf("Erro Sintático! \n Diretiva CONST na sessão errada. \n Linha: %d \n", n_linha); */
 			}
 			else
 			{
 				if (!str.compare("SPACE"))
 				{
-					if ((n_linha >= data) && (data != -1))
-					{
+
+					/*if ((n_linha >= data) && (data != -1))
+					{*/
 						++it;
 						if (it != token_vector.end()) //verifica se tem algum operando na diretiva space
 						{
@@ -2291,12 +2298,12 @@ void segunda_passagem(string file_in, string file_out)
 						{
 							aux.push_back("X");
 						}
-					}
+					/*}
 					else
 					{
 						if (TRABALHO1)
 							printf("Erro Sintático! \n Diretiva SPACE na sessão errada. \n Linha: %d \n", n_linha); 
-					}
+					}*/
 				}
 				else
 				{

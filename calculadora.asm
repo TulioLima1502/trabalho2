@@ -30,13 +30,14 @@
 ; PARA A CONFECÇÃO DO TRABALHO 2 FOI UTILIZADO O VISUAL STUDIO CODE ( Diferente do visual studio community, mas igualmente gratuito)
 ;
 ; INSTRUÇÕES DE USO/COMPILAÇÃO
-; É NECESSÁRIO DE UM COMPUTADOR COM LINUX (UBUNTU 16 e 18)
+; É NECESSÁRIO DE UM COMPUTADOR COM LINUX (UBUNTU 18)
 ; É NECESSÁRIO REALIZAR A COMPILAÇÃO PARA SÓ EM SEGUIDA LIGAR E POR FIM EXECUTAR
 ; O COMANDO DE COMPILAÇÃO É: nasm -f elf -o calculadora.o calculadora.asm
 ; O COMANDO PARA LIGAR É: ld -m elf_i386 -o calculadora calculadora.o
 ; o COMANDO PARA EXECUTAR É: ./calculadora
 ;
-;
+; A versão de nasm utilizada foi: NASM version 2.13.02
+; A versão de ld GNU utilizada foi: GNU ld (GNU Binutils for Ubuntu) 2.30
 
 
 section .data

@@ -25,6 +25,7 @@
 // 			./<nome do executável> <nome do arquivo1> <nome do arquivo2>
 //
 // ** PARA CORRETO FUNCIONAMENTO É NECESSAŔIO TER UM ARQUIVO TEXTO COM EXTENSÃO .ASM NA MESMA PASTA DO PROGRAMA TRABALHO2.CPP
+// ** Arquivos gerados no windows e/ou baixados diretamente do moodle dão erro de execução. É necessário que o arquivo tenha sido gerado no ambiente linux.
 
 #define DEBUG 0
 #define TRABALHO1 0 //Mensagens de erro do trabalho 1 
@@ -1887,6 +1888,7 @@ void primeira_passagem(string file_in, int n_files)
 			if (!str.compare("CONST"))
 			{
 				++pc;
+				info_relocacao.push_back(pc);
 			}
 			else
 			{

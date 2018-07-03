@@ -1,9 +1,20 @@
+Débora Ferreira dos Santos
+Túlio Mariano da Silva Lima
+
+*****************************************************************
+
 O programa do montador está nomeado como trabalho2.cpp
     - instruções de uso estão detalhadas no escopo do arquivo trabalho2.cpp
     - tem com saida um ou dois arquivos de mesmo nome dado na chamada do programa com a extensão .o
+    
+*****************************************************************
+
 O programa do ligador está nomeado como ligador.cpp
     - instruções de uso estão detalhadas no escopo do arquivo ligador.cpp
     - tem com saida um arquivo de nome 'saida' com a extensão .o
+    
+*****************************************************************
+
 O programa da calculadora está nomeado como calculadora.asm
     - instruções de uso estão detalhadas no escopo do arquivo calculadora.asm
     - não fornece saída de arquivos, apenas interação via terminal
